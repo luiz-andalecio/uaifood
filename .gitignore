@@ -15,10 +15,10 @@ pnpm-debug.log*
 /.next/
 
 # Env
-.env
-.env.*
-backend/.env
-frontend/.env
+# .env
+# .env.*
+# backend/.env
+# frontend/.env
 
 # Prisma
 **/prisma/dev.db

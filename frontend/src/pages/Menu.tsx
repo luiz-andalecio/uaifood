@@ -1,5 +1,7 @@
 // Pagina de Cardapio com abas simples
 import { useEffect, useState } from 'react'
+import { useCart } from '@/contexts/CartContext'
+import { Plus } from 'lucide-react'
 
 // tipo basico de item e categoria
 type Item = { id: string; name: string; price: number }
@@ -7,6 +9,7 @@ type Category = { id: string; name: string; items: Item[] }
 
 export default function Menu() {
   const [categories, setCategories] = useState<Category[]>([])
+  const { addItem } = useCart()
 
   // carrega dados da API publica
   useEffect(() => {
@@ -32,7 +35,12 @@ export default function Menu() {
                     <div className="font-medium">{it.name}</div>
                     <div className="text-sm text-gray-600">R$ {Number(it.price).toFixed(2)}</div>
                   </div>
-                  <button className="px-4 py-2 rounded bg-yellow-500 text-white">+ Adicionar</button>
+                  <button
+                    onClick={() => addItem({ id: it.id, name: it.name, price: Number(it.price) }, 1)}
+                    className="px-4 py-2 rounded bg-yellow-500 text-white inline-flex items-center gap-2"
+                  >
+                    <Plus size={16} /> Adicionar
+                  </button>
                 </li>
               ))}
             </ul>

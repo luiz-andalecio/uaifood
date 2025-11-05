@@ -1,0 +1,16 @@
+{
+  "name": "uaifood",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "front": "npm --prefix frontend run dev",
+    "back": "npm --prefix backend run dev",
+    "db:up": "docker compose up -d db",
+    "db:down": "docker compose down",
+    "watch": "concurrently -n FRONT,BACK -c green,blue \"npm --prefix frontend run dev\" \"npm --prefix backend run dev\"",
+    "live": "npm run db:up && npm run watch"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

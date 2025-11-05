@@ -169,9 +169,13 @@ Este roteiro define as entregas planejadas do projeto **UAIFood**.
 - [✅] Criar páginas:
   - Login  
   - Cadastro
-- [ ] Implementar controle de rotas protegidas com React Router
-- [ ] Navbar dinâmica (foto de perfil, logout, etc.)
-- [ ] Página de perfil com dados do usuário logado
+- [✅] Implementar controle de rotas protegidas com React Router (ProtectedRoute)
+- [✅] Navbar dinâmica (perfil + logout quando autenticado)
+- [✅] Página de perfil com dados do usuário logado (`/perfil`)
+
+Observações rápidas:
+- O token é armazenado no `localStorage` e validado no carregamento inicial via `/api/users/me`.
+- Para testar, faça login e acesse `/perfil`. Usuários não logados são redirecionados para `/login` e voltam à página original após autenticar.
 
 ---
 
@@ -181,21 +185,25 @@ Este roteiro define as entregas planejadas do projeto **UAIFood**.
 
 ### ✅ Tarefas
 
-- [ ] Criar rotas backend:
+- [✅] Criar rotas backend:
   - `/menu` (listar itens e categorias)
   - `/orders` (criar e listar pedidos)
 - [✅] Implementar modelos `Item` e `OrderItem` no Prisma
-- [ ] Criar endpoints para adicionar/remover itens do pedido
+- [✅] Criar fluxo de criação de pedido (POST `/api/orders`)
 - [✅] Página **Cardápio**:
   - Categorias em abas (tabs)
   - Cards de itens com botão “Adicionar ao Carrinho”
-- [ ] Estado global/contexto para o carrinho
-- [ ] Ícone do carrinho na navbar com contador
-- [✅] Página **Carrinho** (placeholder inicial):
+- [✅] Estado global/contexto para o carrinho
+- [✅] Ícone do carrinho na navbar com contador
+- [✅] Página **Carrinho**:
   - Listagem de itens, total, botão “Finalizar Pedido”
-  - Modal de confirmação (mesa, pagamento, total)
-- [ ] Página **Meus Pedidos**:
-  - Histórico do usuário com status e valores
+  - Campos: mesa (opcional) e método de pagamento
+- [✅] Página **Meus Pedidos**:
+  - Histórico do usuário com valores (sem exibição de status)
+
+Observações rápidas:
+- O carrinho persiste em `localStorage` e é enviado ao backend no momento do checkout.
+- O endpoint `POST /api/orders` exige autenticação (Bearer token). Após finalizar, o carrinho é limpo e o usuário é direcionado para `/perfil`.
 
 ---
 
@@ -205,21 +213,25 @@ Este roteiro define as entregas planejadas do projeto **UAIFood**.
 
 ### ✅ Tarefas
 
-- [ ] Criar rota `/admin/items` com CRUD completo de pratos
-- [ ] Página **Gerenciar Cardápio**:
-  - Tabela com nome, preço, categoria
-  - Botões “Editar”, “Excluir” e “Adicionar Prato”
-- [ ] Criar rota `/admin/users`
-- [ ] Página **Gerenciar Usuários**:
-  - Listagem de contas (nome, tipo)
-  - Dropdown para trocar tipo (Usuário ↔ Admin)
-  - Botão “Excluir Conta”
-- [ ] Painel Root:
+- [✅] CRUD de pratos disponível para ADMIN (via rotas protegidas `/api/menu/items`)
+- [✅] Página **Gerenciar Cardápio**:
+  - Listagem em tabela com nome e preço
+  - Criar item, editar e excluir
+- [✅] Rotas de usuários para administração (via `/api/users` com guards)
+- [✅] Página **Gerenciar Usuários**:
+  - Listagem de contas (nome, e-mail, tipo)
+  - Alteração de tipo (ROOT) implementada
+- [✅] Painel Root:
   - Pode editar senha de qualquer usuário
   - Pode promover/rebaixar admins
-  - Pode excluir qualquer conta
-- [ ] Página **Dashboard** (opcional):
-  - Total de usuários, pedidos e itens cadastrados
+  - Pode excluir qualquer conta (soft delete)
+- [✅] Página **Dashboard**:
+  - Total de usuários, pedidos e itens cadastrados (GET `/api/admin/dashboard`)
+
+Observações rápidas:
+- As rotas `/admin`, `/admin/cardapio` e `/admin/usuarios` estão protegidas por role (ADMIN/ROOT) e usam `RoleRoute` no frontend.
+- O menu "Admin", "Cardápio" e "Usuários" aparece na navbar apenas para ADMIN/ROOT.
+- Exclusão de usuários é feita como desativação (soft delete) para preservar integridade dos dados.
 
 ---
 
@@ -230,7 +242,7 @@ Este roteiro define as entregas planejadas do projeto **UAIFood**.
 ### ✅ Tarefas
 
 - [ ] Adicionar animações leves (fade, hover, slide)
-- [ ] Mensagens de sucesso e erro (toasts)
+- [✅] Mensagens de sucesso e erro (toasts)
 - [ ] Melhorar responsividade com Tailwind
 - [ ] Revisar fluxo completo:
   - Login → Cardápio → Pedido → Histórico

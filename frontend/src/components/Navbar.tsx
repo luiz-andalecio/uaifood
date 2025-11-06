@@ -63,13 +63,7 @@ export function Navbar() {
               {isAdmin && (
                 <div className="flex items-center gap-3 pr-3 mr-1 border-r">
                   <NavLink to="/admin" className={({isActive})=> `inline-flex items-center gap-1 ${isActive? 'text-tertiary font-semibold':'text-gray-700 hover:text-tertiary'}`}>
-                    <Shield size={16} /> Admin
-                  </NavLink>
-                  <NavLink to="/admin/cardapio" className={({isActive})=> `inline-flex items-center gap-1 ${isActive? 'text-tertiary font-semibold':'text-gray-700 hover:text-tertiary'}`}>
-                    <Utensils size={16} /> Cardápio
-                  </NavLink>
-                  <NavLink to="/admin/usuarios" className={({isActive})=> `inline-flex items-center gap-1 ${isActive? 'text-tertiary font-semibold':'text-gray-700 hover:text-tertiary'}`}>
-                    <Users size={16} /> Usuários
+                    <Shield size={16} />
                   </NavLink>
                 </div>
               )}
@@ -126,16 +120,9 @@ export function Navbar() {
             </div>
             {/* Admin */}
             {token && isAdmin && (
-              <div className="pt-2 border-t flex flex-col gap-2">
-                <div className="text-xs uppercase text-gray-500">Administração</div>
+              <div className="pt-3 border-t flex flex-col gap-2">
                 <NavLink to="/admin" className={({isActive})=> `inline-flex items-center gap-2 ${isActive? 'text-tertiary font-semibold':'text-gray-700'}`}>
-                  <Users size={18} /> Admin
-                </NavLink>
-                <NavLink to="/admin/cardapio" className={({isActive})=> `inline-flex items-center gap-2 ${isActive? 'text-tertiary font-semibold':'text-gray-700'}`}>
-                  <Utensils size={18} /> Cardápio
-                </NavLink>
-                <NavLink to="/admin/usuarios" className={({isActive})=> `inline-flex items-center gap-2 ${isActive? 'text-tertiary font-semibold':'text-gray-700'}`}>
-                  <Users size={18} /> Usuários
+                  <Shield size={18} /> Administração
                 </NavLink>
               </div>
             )}

@@ -1,5 +1,4 @@
 // script de seed para popular banco com dados iniciais
-// comentarios em portugues, sem acentos para evitar problemas de encoding
 import { PrismaClient, UserRole } from '@prisma/client'
 import bcrypt from 'bcryptjs'
 import dotenv from 'dotenv'
@@ -8,7 +7,7 @@ dotenv.config()
 const prisma = new PrismaClient()
 
 async function main() {
-  // cria usuario ROOT padrao (nao usar em producao)
+  // cria usuario ROOT padrao
   const rootEmail = 'root@uaifood.com'
   const rootExists = await prisma.user.findUnique({ where: { email: rootEmail } })
   if (!rootExists) {
@@ -21,21 +20,6 @@ async function main() {
       }
     })
     console.log('Usuario ROOT criado: root@uaifood.com / root123')
-  }
-
-  // cria usuario ROOT adicional (contato@uaifood.com.br) se nao existir
-  const root2Email = 'contato@uaifood.com.br'
-  const root2Exists = await prisma.user.findUnique({ where: { email: root2Email } })
-  if (!root2Exists) {
-    await prisma.user.create({
-      data: {
-        name: 'Root',
-        email: root2Email,
-        password_hash: await bcrypt.hash('UAIFoodRoot123!!!', 10),
-        role: UserRole.ROOT
-      }
-    })
-    console.log('Usuario ROOT criado: contato@uaifood.com.br / UAIFoodRoot123!!!')
   }
 
   // categorias

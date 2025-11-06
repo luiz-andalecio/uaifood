@@ -4,14 +4,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 // script de seed para popular banco com dados iniciais
-// comentarios em portugues, sem acentos para evitar problemas de encoding
 const client_1 = require("@prisma/client");
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
 const prisma = new client_1.PrismaClient();
 async function main() {
-    // cria usuario ROOT padrao (nao usar em producao)
+    // cria usuario ROOT padrao
     const rootEmail = 'root@uaifood.com';
     const rootExists = await prisma.user.findUnique({ where: { email: rootEmail } });
     if (!rootExists) {

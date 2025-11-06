@@ -8,6 +8,7 @@ export default function AdminDashboard() {
   const { token } = useAuth()
   const [data, setData] = useState<Metrics | null>(null)
   const [loading, setLoading] = useState(true)
+  const iconSize = 16;
 
   useEffect(() => {
     async function load() {
@@ -40,6 +41,37 @@ export default function AdminDashboard() {
           </div>
         </div>
       )}
+      <div className="text-2xl front-bold">
+        <div className="grid md:grid-cols-3 gap-6">
+          {['Gerenciar Usuários'].slice(0, 1).map((t) => (
+            <a key={t} href='admin/usuarios' className='p-6 rounded-xl border hover:shadow bg-red/50 mt-6'>
+              <h3 className="font-semibold">{t}</h3>
+              <div className="text-sm text-gray-600">
+                <Users size={iconSize} className="text-yellow-500" />
+                Veja e gerencie os usuários
+              </div>
+            </a>
+          ))}
+          {['Editar Cardápio'].slice(0, 1).map((t) => (
+            <a key={t} href='admin/cardapio' className="p-6 rounded-xl border hover:shadow bg-yellow/50 mt-6">
+              <h3 className="font-semibold">{t}</h3>
+              <div className="text-sm text-gray-600">
+                <Utensils size={iconSize} className="text-yellow-500" />
+                Gerencie os itens do cardápio
+              </div>
+            </a>
+          ))}
+          {['Minha Conta'].slice(0, 1).map((t) => (
+            <a key={t} href='/perfil' className='p-6 rounded-xl border hover:shadow bg-green/50 mt-6'>
+              <h3 className="font-semibold">{t}</h3>
+              <div className="text-sm text-gray-600">
+                <Receipt size={iconSize} className="text-yellow-500" />
+                Veja e edite suas informações
+              </div>
+            </a>
+          ))}
+        </div>
+      </div>
     </div>
   )
 }

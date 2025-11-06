@@ -1,5 +1,5 @@
 services:
-  postgres:
+  db:
     image: postgres:16-alpine
     container_name: uaifood-db
     restart: unless-stopped
@@ -17,20 +17,18 @@ services:
       retries: 10
       timeout: 5s
 
-    # Optional: pgAdmin for managing the Postgres of this project.
-     # Reads default admin credentials from environment variables if provided.
-    pgadmin:
-      image: dpage/pgadmin4
-      container_name: uaifood_pgadmin
-      restart: unless-stopped
-      environment:
-        PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-admin@example.com}
-        PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
-      ports:
-        - "5052:80" # Access pgAdmin at http://localhost:5051
-      extra_hosts:
-        - "host.docker.internal:host-gateway" # allow pgAdmin container to reach host ports on Linux
-      depends_on:
-        - postgres
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: readowl_pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-admin@example.com}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+    ports:
+      - "5050:80" # Access pgAdmin at http://localhost:5050
+    extra_hosts:
+      - "host.docker.internal:host-gateway" # allow pgAdmin container to reach host ports on Linux
+    depends_on:
+      - db
 volumes:
   dbdata:

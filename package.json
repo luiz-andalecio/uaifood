@@ -8,7 +8,9 @@
     "db:up": "docker compose up -d db",
     "db:down": "docker compose down",
     "watch": "concurrently -n FRONT,BACK -c green,blue \"npm --prefix frontend run dev\" \"npm --prefix backend run dev\"",
-    "live": "npm run db:up && npm run watch"
+    "live": "npm run db:up && npm run watch",
+    "build": "npm --prefix backend run build && npm --prefix frontend run build",
+    "typecheck": "npm --prefix backend run typecheck && npm --prefix frontend run typecheck"
   },
   "devDependencies": {
     "concurrently": "^8.2.2"

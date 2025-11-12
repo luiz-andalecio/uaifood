@@ -21,6 +21,9 @@ exports.router.get('/', auth_1.verifyToken, async (req, res) => {
 exports.router.post('/', auth_1.verifyToken, async (req, res) => {
     const userId = req.user.id;
     const { tableNumber, paymentMethod, items } = req.body;
+    if (!tableNumber || tableNumber.trim() === '') {
+        return res.status(400).json({ message: 'Informe o numero da mesa.' });
+    }
     if (!items || !Array.isArray(items) || items.length === 0) {
         return res.status(400).json({ message: 'Itens do pedido sao obrigatorios.' });
     }
@@ -55,7 +58,8 @@ exports.router.post('/', auth_1.verifyToken, async (req, res) => {
                 payment_method: paymentMethod ? paymentMethod : null,
                 subtotal,
                 tax,
-                total
+                total,
+                status: client_1.OrderStatus.PENDENTE
             }
         });
         await tx.orderItem.createMany({

@@ -1,6 +1,6 @@
 // rotas de pedidos: criar e listar pedidos do usuario autenticado
 import { Router, type Request, type Response } from 'express'
-import { PrismaClient, PaymentMethod } from '@prisma/client'
+import { PrismaClient, PaymentMethod, OrderStatus } from '@prisma/client'
 import { verifyToken } from '../middlewares/auth'
 
 const prisma = new PrismaClient()
@@ -24,6 +24,9 @@ router.post('/', verifyToken, async (req: Request, res: Response) => {
     tableNumber?: string | null
     paymentMethod?: keyof typeof PaymentMethod
     items: Array<{ itemId: string; quantity: number }>
+  }
+  if (!tableNumber || tableNumber.trim() === '') {
+    return res.status(400).json({ message: 'Informe o numero da mesa.' })
   }
   if (!items || !Array.isArray(items) || items.length === 0) {
     return res.status(400).json({ message: 'Itens do pedido sao obrigatorios.' })
@@ -61,7 +64,8 @@ router.post('/', verifyToken, async (req: Request, res: Response) => {
         payment_method: paymentMethod ? (paymentMethod as PaymentMethod) : null,
         subtotal,
         tax,
-        total
+        total,
+        status: OrderStatus.PENDENTE
       }
     })
     await tx.orderItem.createMany({

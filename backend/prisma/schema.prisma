@@ -23,6 +23,13 @@ enum PaymentMethod {
   PIX
 }
 
+enum OrderStatus {
+  PENDENTE
+  PREPARANDO
+  PRONTO
+  ENTREGUE
+  CANCELADO
+}
 
 model User {
   id            String   @id @default(uuid())
@@ -79,6 +86,7 @@ model Order {
   user           User          @relation(fields: [user_id], references: [id])
   table_number   String?
   payment_method PaymentMethod?
+  status         OrderStatus   @default(PENDENTE)
   subtotal       Decimal       @db.Decimal(10, 2)
   tax            Decimal?      @db.Decimal(10, 2)
   total          Decimal       @db.Decimal(10, 2)

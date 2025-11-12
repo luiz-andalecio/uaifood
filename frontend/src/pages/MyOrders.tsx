@@ -1,7 +1,7 @@
 // pagina de historico de pedidos do usuario autenticado
 import { useEffect, useState } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
-import { ShoppingBag, CalendarClock } from 'lucide-react'
+import { ShoppingBag, CalendarClock, CheckCircle2, Hourglass, AlertTriangle, Truck } from 'lucide-react'
 
 type OrderItemView = {
   id: string
@@ -15,6 +15,7 @@ type OrderView = {
   id: string
   total: number
   created_at?: string
+  status?: 'PENDENTE' | 'PREPARANDO' | 'PRONTO' | 'ENTREGUE' | 'CANCELADO'
   items?: OrderItemView[]
 }
 
@@ -67,6 +68,24 @@ export default function MyOrders() {
                   <div className="text-sm text-gray-600 inline-flex items-center gap-1">
                     <CalendarClock size={14} /> {o.created_at ? new Date(o.created_at).toLocaleString() : ''}
                   </div>
+                </div>
+                {/* Status do pedido */}
+                <div>
+                  {o.status === 'PENDENTE' && (
+                    <span className="text-xs px-2 py-1 rounded bg-yellow-100 text-yellow-800 inline-flex items-center gap-1"><Hourglass size={14}/> PENDENTE</span>
+                  )}
+                  {o.status === 'PREPARANDO' && (
+                    <span className="text-xs px-2 py-1 rounded bg-blue-100 text-blue-800 inline-flex items-center gap-1"><Hourglass size={14}/> PREPARANDO</span>
+                  )}
+                  {o.status === 'PRONTO' && (
+                    <span className="text-xs px-2 py-1 rounded bg-green-100 text-green-800 inline-flex items-center gap-1"><CheckCircle2 size={14}/> PRONTO</span>
+                  )}
+                  {o.status === 'ENTREGUE' && (
+                    <span className="text-xs px-2 py-1 rounded bg-emerald-100 text-emerald-800 inline-flex items-center gap-1"><Truck size={14}/> ENTREGUE</span>
+                  )}
+                  {o.status === 'CANCELADO' && (
+                    <span className="text-xs px-2 py-1 rounded bg-red-100 text-red-800 inline-flex items-center gap-1"><AlertTriangle size={14}/> CANCELADO</span>
+                  )}
                 </div>
               </div>
               <ul className="text-sm text-gray-700 mb-2">

@@ -1,5 +1,6 @@
 // Página inicial com seções básicas (hero + destaques)
 import { useAuth } from "../contexts/AuthContext"
+import { NavLink } from 'react-router-dom'
 import { UtensilsCrossed, ArrowRight } from 'lucide-react'
 
 export default function Home() {
@@ -17,9 +18,11 @@ export default function Home() {
             Peça suas refeições favoritas com facilidade e receba na mesa.
           </p>
           <div className="mt-8 flex gap-4">
-            <a className="px-5 py-3 rounded bg-yellow-500 text-white inline-flex items-center gap-2" href="/cardapio">
-              <UtensilsCrossed size={18} /> Ver Cardápio
-            </a>
+            <NavLink to="/cardapio">
+              <div className="px-5 py-3 rounded bg-yellow-500 text-white inline-flex items-center gap-2">
+                <UtensilsCrossed size={18} /> Ver Cardápio
+              </div>
+            </NavLink>
             {!token && (
               <a className="px-5 py-3 rounded border border-yellow-500 text-yellow-700 inline-flex items-center gap-2" href="/cadastro">
                 Criar Conta <ArrowRight size={18} />
@@ -34,7 +37,7 @@ export default function Home() {
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-3xl font-bold mb-6">Explore Nosso <span className="text-red-500">Cardápio</span></h2>
           <div className="grid md:grid-cols-3 gap-6">
-            {['Pratos Principais','Pizzas','Saladas','Bebidas','Sobremesas','Bolos'].slice(0,6).map((t)=> (
+            {['Acompanhamentos', 'Bebidas', 'Entradas', 'Pratos Principais', 'Sobremesas'].slice(0, 6).map((t) => (
               <a key={t} href="/cardapio" className="p-6 rounded-xl border hover:shadow bg-white">
                 <h3 className="font-semibold">{t}</h3>
                 <p className="text-sm text-gray-600">Clique para ver todos</p>

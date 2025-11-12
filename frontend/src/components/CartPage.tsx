@@ -19,6 +19,10 @@ export default function CartPage() {
     if (!token) {
       return navigate('/login', { state: { from: { pathname: '/carrinho' } } })
     }
+    if (!tableNumber || tableNumber.trim() === '') {
+      toast.error('Informe o número da mesa')
+      return
+    }
     if (items.length === 0) {
       toast.info('Seu carrinho está vazio')
       return

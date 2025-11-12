@@ -45,7 +45,12 @@ async function main() {
       { id: 'seed-entradas-2', name: 'Torresmo Crocante', price: 10.0 },
       { id: 'seed-entradas-3', name: 'Bolinho de Mandioca', price: 9.0 },
       { id: 'seed-entradas-4', name: 'Caldo de Feijão', price: 8.5 },
-      { id: 'seed-entradas-5', name: 'Antepasto Mineiro', price: 12.0 }
+      { id: 'seed-entradas-5', name: 'Antepasto Mineiro', price: 12.0 },
+      { id: 'seed-entradas-6', name: 'Queijo Minas Frito', price: 11.0 },
+      { id: 'seed-entradas-7', name: 'Pastel de Angu', price: 7.5 },
+      { id: 'seed-entradas-8', name: 'Linguiça Acebolada', price: 13.0 },
+      { id: 'seed-entradas-9', name: 'Bolinho de Arroz', price: 6.5 },
+      { id: 'seed-entradas-10', name: 'Caldinho de Feijão com Torresmo', price: 9.5 }
     ],
     'Pratos Principais': [
       { id: 'seed-pratos-1', name: 'Feijão Tropeiro', price: 22.0 },
@@ -54,28 +59,46 @@ async function main() {
       { id: 'seed-pratos-4', name: 'Lombo Suíno ao Molho', price: 26.0 },
       { id: 'seed-pratos-5', name: 'Tutu à Mineira', price: 20.0 },
       { id: 'seed-pratos-6', name: 'Bife Acebolado', price: 23.0 },
-      { id: 'seed-pratos-7', name: 'Costelinha com Canjiquinha', price: 29.0 }
+      { id: 'seed-pratos-7', name: 'Costelinha com Canjiquinha', price: 29.0 },
+      { id: 'seed-pratos-8', name: 'Galinhada Mineira', price: 25.0 },
+      { id: 'seed-pratos-9', name: 'Frango Caipira', price: 24.0 },
+      { id: 'seed-pratos-10', name: 'Carne de Panela', price: 21.0 }
     ],
     'Acompanhamentos': [
       { id: 'seed-acomp-1', name: 'Arroz Branco', price: 8.0 },
       { id: 'seed-acomp-2', name: 'Farofa de Manteiga', price: 7.0 },
       { id: 'seed-acomp-3', name: 'Mandioca Frita', price: 9.0 },
       { id: 'seed-acomp-4', name: 'Salada de Folhas', price: 6.5 },
-      { id: 'seed-acomp-5', name: 'Legumes Salteados', price: 8.5 }
+      { id: 'seed-acomp-5', name: 'Legumes Salteados', price: 8.5 },
+      { id: 'seed-acomp-6', name: 'Couve Mineira', price: 6.5 },
+      { id: 'seed-acomp-7', name: 'Polenta Frita', price: 7.5 },
+      { id: 'seed-acomp-8', name: 'Angu (Polenta de Fubá)', price: 10.0 },
+      { id: 'seed-acomp-9', name: 'Purê de Batata com Queijo Minas', price: 9.0 },
+      { id: 'seed-acomp-10', name: 'Farofa de Torresmo', price: 8.0 }
     ],
     'Bebidas': [
       { id: 'seed-bebidas-1', name: 'Suco de Laranja', price: 7.0 },
       { id: 'seed-bebidas-2', name: 'Refrigerante Lata', price: 6.0 },
       { id: 'seed-bebidas-3', name: 'Água Mineral', price: 4.0 },
       { id: 'seed-bebidas-4', name: 'Cerveja Long Neck', price: 10.0 },
-      { id: 'seed-bebidas-5', name: 'Suco de Uva', price: 7.5 }
+      { id: 'seed-bebidas-5', name: 'Suco de Uva', price: 7.5 },
+      { id: 'seed-bebidas-6', name: 'Caldo de Cana', price: 8.0 },
+      { id: 'seed-bebidas-7', name: 'Cachaça Artesanal', price: 15.0 },
+      { id: 'seed-bebidas-8', name: 'Chá de Erva-Doce', price: 5.0 },
+      { id: 'seed-bebidas-9', name: 'Café Coado', price: 5.0 },
+      { id: 'seed-bebidas-10', name: 'Guaraná Natural', price: 6.5 }
     ],
     'Sobremesas': [
       { id: 'seed-sobrem-1', name: 'Doce de Leite', price: 7.0 },
       { id: 'seed-sobrem-2', name: 'Romeu e Julieta', price: 8.0 },
       { id: 'seed-sobrem-3', name: 'Pudim de Leite', price: 9.0 },
       { id: 'seed-sobrem-4', name: 'Ambrosia', price: 8.5 },
-      { id: 'seed-sobrem-5', name: 'Cocada Cremosa', price: 7.5 }
+      { id: 'seed-sobrem-5', name: 'Cocada Cremosa', price: 7.5 },
+      { id: 'seed-sobrem-6', name: 'Queijadinha', price: 6.5 },
+      { id: 'seed-sobrem-7', name: 'Doce de Abóbora com Coco', price: 7.0 },
+      { id: 'seed-sobrem-8', name: 'Bolo de Fubá', price: 6.5 },
+      { id: 'seed-sobrem-9', name: 'Pé-de-Moleque', price: 5.5 },
+      { id: 'seed-sobrem-10', name: 'Doce de Banana', price: 6.0 }
     ]
   }
 

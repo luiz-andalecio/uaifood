@@ -1,9 +1,0 @@
-export default function CartPage() {
-  // comentario: placeholder simples do carrinho
-  return (
-    <div className="max-w-3xl mx-auto px-4 py-10">
-      <h1 className="text-3xl font-bold mb-4">Carrinho</h1>
-      <div className="rounded-xl bg-white p-6 border">Seu carrinho este1 vazio (placeholder)</div>
-    </div>
-  )
-}

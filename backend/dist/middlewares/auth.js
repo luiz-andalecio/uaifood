@@ -1,12 +1,9 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.verifyToken = verifyToken;
 exports.isAdmin = isAdmin;
 exports.isRoot = isRoot;
-const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const jwt_1 = require("../core/jwt");
 function verifyToken(req, res, next) {
     // extrai token do header Authorization: Bearer <token>
     const auth = req.headers.authorization;
@@ -14,7 +11,7 @@ function verifyToken(req, res, next) {
         return res.status(401).json({ message: 'Token ausente.' });
     const [, token] = auth.split(' ');
     try {
-        const payload = jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET);
+        const payload = (0, jwt_1.verifyJwt)(token);
         req.user = { id: payload.sub, role: payload.role };
         return next();
     }

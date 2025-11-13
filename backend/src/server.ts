@@ -3,15 +3,14 @@ import express from 'express'
 import cors from 'cors'
 import morgan from 'morgan'
 import helmet from 'helmet'
-import dotenv from 'dotenv'
+import env from './config/env'
 import swaggerUi from 'swagger-ui-express'
 import fs from 'fs'
 import path from 'path'
 import YAML from 'yaml'
 
 import { router as apiRouter } from './routes/index'
-
-dotenv.config()
+import { errorHandler } from './middlewares/error'
 
 const app = express()
 
@@ -60,7 +59,10 @@ app.get('/', (_: Request, res: Response) => {
 // rotas da API
 app.use('/api', apiRouter)
 
-const PORT = Number(process.env.PORT || 3333)
+// handler global de erros (precisa ser o último middleware)
+app.use(errorHandler)
+
+const PORT = env.port
 app.listen(PORT, () => {
   console.log(`UAIFood backend rodando em http://localhost:${PORT}`)
   console.log(`Swagger (se habilitado) em http://localhost:${PORT}/docs`)

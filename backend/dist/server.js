@@ -8,13 +8,13 @@ const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const morgan_1 = __importDefault(require("morgan"));
 const helmet_1 = __importDefault(require("helmet"));
-const dotenv_1 = __importDefault(require("dotenv"));
+const env_1 = __importDefault(require("./config/env"));
 const swagger_ui_express_1 = __importDefault(require("swagger-ui-express"));
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const yaml_1 = __importDefault(require("yaml"));
 const index_1 = require("./routes/index");
-dotenv_1.default.config();
+const error_1 = require("./middlewares/error");
 const app = (0, express_1.default)();
 // middlewares globais
 app.use((0, helmet_1.default)()); // seguranca basica
@@ -57,7 +57,9 @@ app.get('/', (_, res) => {
 });
 // rotas da API
 app.use('/api', index_1.router);
-const PORT = Number(process.env.PORT || 3333);
+// handler global de erros (precisa ser o último middleware)
+app.use(error_1.errorHandler);
+const PORT = env_1.default.port;
 app.listen(PORT, () => {
     console.log(`UAIFood backend rodando em http://localhost:${PORT}`);
     console.log(`Swagger (se habilitado) em http://localhost:${PORT}/docs`);

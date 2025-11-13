@@ -1,6 +1,6 @@
 // middlewares de autenticação e autorização por role
 import { Request, Response, NextFunction } from 'express'
-import jwt from 'jsonwebtoken'
+import { verifyJwt } from '../core/jwt'
 
 export function verifyToken(req: Request, res: Response, next: NextFunction) {
     // extrai token do header Authorization: Bearer <token>
@@ -9,8 +9,8 @@ export function verifyToken(req: Request, res: Response, next: NextFunction) {
 
     const [, token] = auth.split(' ')
     try {
-        const payload = jwt.verify(token, process.env.JWT_SECRET as string) as any
-            ; (req as any).user = { id: payload.sub, role: payload.role }
+        const payload = verifyJwt(token)
+        ; (req as any).user = { id: payload.sub, role: payload.role }
         return next()
     } catch (e) {
         return res.status(401).json({ message: 'Token inválido.' })

@@ -8,13 +8,14 @@ exports.router = void 0;
 const express_1 = require("express");
 const client_1 = require("@prisma/client");
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
-const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const jwt_1 = require("../core/jwt");
 const prisma = new client_1.PrismaClient();
 exports.router = (0, express_1.Router)();
 // POST /api/auth/register
 exports.router.post('/register', async (req, res) => {
     // validações simples de campos obrigatórios
-    const { name, email, password, phone } = req.body;
+    let { name, email, password, phone } = req.body;
+    email = (email ?? '').trim().toLowerCase();
     if (!name || !email || !password) {
         return res.status(400).json({ message: 'Nome, email e senha são obrigatórios.' });
     }
@@ -29,7 +30,8 @@ exports.router.post('/register', async (req, res) => {
 });
 // POST /api/auth/login
 exports.router.post('/login', async (req, res) => {
-    const { email, password } = req.body;
+    let { email, password } = req.body;
+    email = (email ?? '').trim().toLowerCase();
     if (!email || !password)
         return res.status(400).json({ message: 'Credenciais inválidas.' });
     const user = await prisma.user.findUnique({ where: { email } });
@@ -38,8 +40,6 @@ exports.router.post('/login', async (req, res) => {
     const ok = await bcryptjs_1.default.compare(password, user.password_hash);
     if (!ok)
         return res.status(401).json({ message: 'Senha incorreta.' });
-    const token = jsonwebtoken_1.default.sign({ sub: user.id, role: user.role }, process.env.JWT_SECRET, {
-        expiresIn: '7d'
-    });
+    const token = (0, jwt_1.signJwt)({ sub: user.id, role: user.role });
     return res.json({ token, user: { id: user.id, name: user.name, email: user.email, role: user.role } });
 });

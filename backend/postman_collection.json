@@ -1,0 +1,170 @@
+{
+  "info": {
+    "name": "UAIFood API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Auth - Register",
+      "request": {
+        "method": "POST",
+        "header": [{"key": "Content-Type", "value": "application/json"}],
+        "url": { "raw": "{{baseUrl}}/api/auth/register", "host": ["{{baseUrl}}"], "path": ["api","auth","register"] },
+        "body": { "mode": "raw", "raw": "{\n  \"name\": \"Maria Silva\",\n  \"email\": \"maria@exemplo.com\",\n  \"password\": \"senhaForte123\"\n}" }
+      }
+    },
+    {
+      "name": "Auth - Login",
+      "request": {
+        "method": "POST",
+        "header": [{"key": "Content-Type", "value": "application/json"}],
+        "url": { "raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api","auth","login"] },
+        "body": { "mode": "raw", "raw": "{\n  \"email\": \"root@uaifood.com\",\n  \"password\": \"root\"\n}" }
+      }
+    },
+    {
+      "name": "Users - Me",
+      "request": {
+        "method": "GET",
+        "header": [{"key": "x-access-token", "value": "{{token}}"}],
+        "url": { "raw": "{{baseUrl}}/api/users/me", "host": ["{{baseUrl}}"], "path": ["api","users","me"] }
+      }
+    },
+    {
+      "name": "Menu - List",
+      "request": {
+        "method": "GET",
+        "url": { "raw": "{{baseUrl}}/api/menu", "host": ["{{baseUrl}}"], "path": ["api","menu"] }
+      }
+    },
+    {
+      "name": "Menu - Create Item",
+      "request": {
+        "method": "POST",
+        "header": [
+          {"key": "Content-Type", "value": "application/json"},
+          {"key": "x-access-token", "value": "{{adminToken}}"}
+        ],
+        "url": { "raw": "{{baseUrl}}/api/menu/items", "host": ["{{baseUrl}}"], "path": ["api","menu","items"] },
+        "body": { "mode": "raw", "raw": "{\n  \"name\": \"Suco de Laranja\",\n  \"price\": 8.0,\n  \"categoryId\": \"cat-bebidas\"\n}" }
+      }
+    },
+    {
+      "name": "Orders - Create",
+      "request": {
+        "method": "POST",
+        "header": [
+          {"key": "Content-Type", "value": "application/json"},
+          {"key": "x-access-token", "value": "{{token}}"}
+        ],
+        "url": { "raw": "{{baseUrl}}/api/orders", "host": ["{{baseUrl}}"], "path": ["api","orders"] },
+        "body": { "mode": "raw", "raw": "{\n  \"tableNumber\": \"7\",\n  \"paymentMethod\": \"PIX\",\n  \"items\": [\n    { \"itemId\": \"it-coca\", \"quantity\": 2 }\n  ]\n}" }
+      }
+    },
+    {
+      "name": "Admin Orders - List",
+      "request": {
+        "method": "GET",
+        "header": [
+          {"key": "x-access-token", "value": "{{adminToken}}"}
+        ],
+        "url": { "raw": "{{baseUrl}}/api/admin/orders", "host": ["{{baseUrl}}"], "path": ["api","admin","orders"] }
+      }
+    },
+    {
+      "name": "Users - Update Me",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {"key": "Content-Type", "value": "application/json"},
+          {"key": "x-access-token", "value": "{{token}}"}
+        ],
+        "url": { "raw": "{{baseUrl}}/api/users/me", "host": ["{{baseUrl}}"], "path": ["api","users","me"] },
+        "body": { "mode": "raw", "raw": "{\n  \"name\": \"Maria S.\",\n  \"phone\": \"+5531888888888\",\n  \"password\": \"senhaForte123\"\n}" }
+      }
+    },
+    {
+      "name": "Users - Change Password",
+      "request": {
+        "method": "POST",
+        "header": [
+          {"key": "Content-Type", "value": "application/json"},
+          {"key": "x-access-token", "value": "{{token}}"}
+        ],
+        "url": { "raw": "{{baseUrl}}/api/users/me/change-password", "host": ["{{baseUrl}}"], "path": ["api","users","me","change-password"] },
+        "body": { "mode": "raw", "raw": "{\n  \"currentPassword\": \"senhaAntiga123\",\n  \"newPassword\": \"novaSenhaSegura456\",\n  \"confirmPassword\": \"novaSenhaSegura456\"\n}" }
+      }
+    },
+    {
+      "name": "Orders - List Mine",
+      "request": {
+        "method": "GET",
+        "header": [
+          {"key": "x-access-token", "value": "{{token}}"}
+        ],
+        "url": { "raw": "{{baseUrl}}/api/orders", "host": ["{{baseUrl}}"], "path": ["api","orders"] }
+      }
+    },
+    {
+      "name": "Admin - Dashboard",
+      "request": {
+        "method": "GET",
+        "header": [
+          {"key": "x-access-token", "value": "{{adminToken}}"}
+        ],
+        "url": { "raw": "{{baseUrl}}/api/admin/dashboard", "host": ["{{baseUrl}}"], "path": ["api","admin","dashboard"] }
+      }
+    },
+    {
+      "name": "Admin Orders - Set Status",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {"key": "Content-Type", "value": "application/json"},
+          {"key": "x-access-token", "value": "{{adminToken}}"}
+        ],
+        "url": { "raw": "{{baseUrl}}/api/admin/orders/{{orderId}}/status", "host": ["{{baseUrl}}"], "path": ["api","admin","orders","{{orderId}}","status"] },
+        "body": { "mode": "raw", "raw": "{\n  \"status\": \"PRONTO\"\n}" }
+      }
+    },
+    {
+      "name": "Admin Orders - Delete",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {"key": "x-access-token", "value": "{{adminToken}}"}
+        ],
+        "url": { "raw": "{{baseUrl}}/api/admin/orders/{{orderId}}", "host": ["{{baseUrl}}"], "path": ["api","admin","orders","{{orderId}}"] }
+      }
+    },
+    {
+      "name": "Menu - Update Item",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {"key": "Content-Type", "value": "application/json"},
+          {"key": "x-access-token", "value": "{{adminToken}}"}
+        ],
+        "url": { "raw": "{{baseUrl}}/api/menu/items/{{itemId}}", "host": ["{{baseUrl}}"], "path": ["api","menu","items","{{itemId}}"] },
+        "body": { "mode": "raw", "raw": "{\n  \"price\": 7.5,\n  \"description\": \"Suco natural 300ml (sem açúcar)\"\n}" }
+      }
+    },
+    {
+      "name": "Menu - Delete Item",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {"key": "x-access-token", "value": "{{adminToken}}"}
+        ],
+        "url": { "raw": "{{baseUrl}}/api/menu/items/{{itemId}}", "host": ["{{baseUrl}}"], "path": ["api","menu","items","{{itemId}}"] }
+      }
+    }
+  ],
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3333" },
+    { "key": "token", "value": "" },
+    { "key": "adminToken", "value": "" },
+    { "key": "orderId", "value": "ord-123" },
+    { "key": "itemId", "value": "it-coca" }
+  ]
+}

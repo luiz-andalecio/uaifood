@@ -5,6 +5,9 @@ exports.router = void 0;
 const express_1 = require("express");
 const client_1 = require("@prisma/client");
 const auth_1 = require("../middlewares/auth");
+const validate_1 = require("../core/validate");
+const admin_schemas_1 = require("../validation/admin.schemas");
+const responses_1 = require("../core/responses");
 const prisma = new client_1.PrismaClient();
 exports.router = (0, express_1.Router)();
 // GET /api/admin/orders - lista pedidos com usuario e itens
@@ -24,19 +27,15 @@ exports.router.get('/', auth_1.verifyToken, auth_1.isAdmin, async (req, res) => 
     res.json({ orders });
 });
 // PATCH /api/admin/orders/:id/status - atualiza status do pedido
-exports.router.patch('/:id/status', auth_1.verifyToken, auth_1.isAdmin, async (req, res) => {
+exports.router.patch('/:id/status', auth_1.verifyToken, auth_1.isAdmin, (0, validate_1.validateBody)(admin_schemas_1.setStatusSchema), async (req, res) => {
     const { id } = req.params;
     const { status } = req.body;
-    const allowed = Object.values(client_1.OrderStatus);
-    if (!status || !allowed.includes(status)) {
-        return res.status(400).json({ message: 'Status invalido.' });
-    }
     try {
         const updated = await prisma.order.update({ where: { id }, data: { status: status } });
-        return res.json({ id: updated.id, status: updated.status });
+        return (0, responses_1.sendSuccess)(res, { id: updated.id, status: updated.status });
     }
     catch (e) {
-        return res.status(404).json({ message: 'Pedido nao encontrado.' });
+        return (0, responses_1.sendError)(res, 'Pedido nao encontrado.', 404);
     }
 });
 // DELETE /api/admin/orders/:id - cancela um pedido
@@ -47,10 +46,10 @@ exports.router.delete('/:id', auth_1.verifyToken, auth_1.isAdmin, async (req, re
             where: { id },
             data: { cancelled_at: new Date(), status: client_1.OrderStatus.CANCELADO }
         });
-        return res.json({ id: updated.id, cancelled_at: updated.cancelled_at });
+        return (0, responses_1.sendSuccess)(res, { id: updated.id, cancelled_at: updated.cancelled_at });
     }
     catch (e) {
-        return res.status(404).json({ message: 'Pedido nao encontrado.' });
+        return (0, responses_1.sendError)(res, 'Pedido nao encontrado.', 404);
     }
 });
 exports.default = exports.router;

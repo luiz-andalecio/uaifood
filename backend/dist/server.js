@@ -14,7 +14,8 @@ const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const yaml_1 = __importDefault(require("yaml"));
 const index_1 = require("./routes/index");
-const error_1 = require("./middlewares/error");
+const errorHandler_1 = require("./middlewares/errorHandler");
+const logger_1 = __importDefault(require("./core/logger"));
 const app = (0, express_1.default)();
 // middlewares globais
 app.use((0, helmet_1.default)()); // seguranca basica
@@ -39,14 +40,14 @@ try {
         app.get('/docs.json', (_req, res) => res.json(swaggerDocument));
         // garantir acesso com barra final
         app.get('/docs/', (_req, res) => res.redirect('/docs'));
-        console.log(`Swagger carregado: ${found}`);
+        logger_1.default.info({ swagger: found }, 'Swagger carregado');
     }
     else {
-        console.warn('Arquivo swagger.yaml não encontrado em caminhos conhecidos. /docs indisponível.');
+        logger_1.default.warn('Arquivo swagger.yaml não encontrado em caminhos conhecidos. /docs indisponível.');
     }
 }
 catch (err) {
-    console.error('Falha ao carregar documentação OpenAPI:', err.message);
+    logger_1.default.error({ err }, 'Falha ao carregar documentação OpenAPI');
 }
 app.get('/health', (_, res) => res.json({ status: 'ok' }));
 // redireciona raiz para documentação se disponível
@@ -58,9 +59,9 @@ app.get('/', (_, res) => {
 // rotas da API
 app.use('/api', index_1.router);
 // handler global de erros (precisa ser o último middleware)
-app.use(error_1.errorHandler);
+app.use(errorHandler_1.errorHandler);
 const PORT = env_1.default.port;
 app.listen(PORT, () => {
-    console.log(`UAIFood backend rodando em http://localhost:${PORT}`);
-    console.log(`Swagger (se habilitado) em http://localhost:${PORT}/docs`);
+    logger_1.default.info(`UAIFood backend rodando em http://localhost:${PORT}`);
+    logger_1.default.info(`Swagger (se habilitado) em http://localhost:${PORT}/docs`);
 });

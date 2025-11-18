@@ -1,5 +1,7 @@
 # UAIFood API – Endpoints
 
+> 📖 Veja instruções detalhadas de autenticação em [docs/auth.md](docs/auth.md)
+
 Documentação resumida dos endpoints (detalhes completos e exemplos em `/docs`).
 
 ## Autenticação (Auth)
@@ -7,6 +9,11 @@ Documentação resumida dos endpoints (detalhes completos e exemplos em `/docs`)
 | ------ | ---- | --------- | ---- |
 | POST | /api/auth/register | Cria usuário cliente | Não |
 | POST | /api/auth/login | Autentica e retorna JWT | Não |
+
+Observações de headers de autenticação:
+- Preferencial: `Authorization: Bearer <token>`
+- Compatível (estilo jwt-example): `x-access-token: <token>`
+  - O backend aceita ambos para facilitar testes via Postman e compatibilidade com exemplos legados.
 
 ## Menu
 | Método | Rota | Descrição | Auth |

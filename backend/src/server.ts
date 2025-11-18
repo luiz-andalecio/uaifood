@@ -10,7 +10,8 @@ import path from 'path'
 import YAML from 'yaml'
 
 import { router as apiRouter } from './routes/index'
-import { errorHandler } from './middlewares/error'
+import { errorHandler } from './middlewares/errorHandler'
+import logger from './core/logger'
 
 const app = express()
 
@@ -39,12 +40,12 @@ try {
     app.get('/docs.json', (_req, res) => res.json(swaggerDocument))
     // garantir acesso com barra final
     app.get('/docs/', (_req, res) => res.redirect('/docs'))
-    console.log(`Swagger carregado: ${found}`)
+    logger.info({ swagger: found }, 'Swagger carregado')
   } else {
-    console.warn('Arquivo swagger.yaml não encontrado em caminhos conhecidos. /docs indisponível.')
+    logger.warn('Arquivo swagger.yaml não encontrado em caminhos conhecidos. /docs indisponível.')
   }
 } catch (err) {
-  console.error('Falha ao carregar documentação OpenAPI:', (err as Error).message)
+  logger.error({ err }, 'Falha ao carregar documentação OpenAPI')
 }
 
 // rota de saude
@@ -64,6 +65,6 @@ app.use(errorHandler)
 
 const PORT = env.port
 app.listen(PORT, () => {
-  console.log(`UAIFood backend rodando em http://localhost:${PORT}`)
-  console.log(`Swagger (se habilitado) em http://localhost:${PORT}/docs`)
+  logger.info(`UAIFood backend rodando em http://localhost:${PORT}`)
+  logger.info(`Swagger (se habilitado) em http://localhost:${PORT}/docs`)
 })

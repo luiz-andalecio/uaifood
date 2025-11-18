@@ -4,10 +4,32 @@ info:
   version: 1.0.0
   description: |
     API do UAIFood (YAML). Segurança JWT via Bearer JWT.
-    Erros padronizados em { message: string } ou estrutura de validação.
+    Também é aceito o cabeçalho `x-access-token` como alternativa (estilo jwt-example).
+
+    ## Autenticação
+    Esta API exige autenticação para a maioria dos endpoints. Você pode enviar o token JWT de duas formas:
+
+    1) Header Authorization (preferencial)
+
+    ```bash
+    curl -H "Authorization: Bearer <seu_token>" http://localhost:3333/api/users/me
+    ```
+
+    2) Header x-access-token (compatibilidade com jwt-example)
+
+    ```bash
+    curl -H "x-access-token: <seu_token>" http://localhost:3333/api/users/me
+    ```
+
+    Para obter o token, faça login em `/api/auth/login`.
 servers:
   - url: http://localhost:3333
     description: Desenvolvimento local
+security:
+  # Requisitos globais: qualquer endpoint exige autenticação (Bearer ou x-access-token),
+  # exceto aqueles que explicitamente definirem `security: []` nas suas operações abaixo.
+  - bearerAuth: []
+  - xAccessToken: []
 tags:
   - name: Health
   - name: Auth
@@ -20,6 +42,7 @@ paths:
     get:
       tags: [Health]
       summary: Verifica saúde do servidor
+      security: []  # público
       responses:
         '200':
           description: OK
@@ -33,6 +56,7 @@ paths:
     post:
       tags: [Auth]
       summary: Cria usuário cliente
+      security: []  # público
       requestBody:
         required: true
         content:
@@ -54,6 +78,7 @@ paths:
     post:
       tags: [Auth]
       summary: Autentica usuário e retorna JWT
+      security: []  # público
       requestBody:
         required: true
         content:
@@ -86,6 +111,7 @@ paths:
     get:
       tags: [Menu]
       summary: Lista categorias e itens ativos
+      security: []  # público
       responses:
         '200':
           description: OK
@@ -113,7 +139,9 @@ paths:
     post:
       tags: [Menu]
       summary: Cria item (ADMIN/ROOT)
-      security: [{ bearerAuth: [] }]
+      security:
+        - bearerAuth: []
+        - xAccessToken: []
       requestBody:
         required: true
         content:
@@ -140,7 +168,9 @@ paths:
     patch:
       tags: [Menu]
       summary: Atualiza item (ADMIN/ROOT)
-      security: [{ bearerAuth: [] }]
+      security:
+        - bearerAuth: []
+        - xAccessToken: []
       parameters:
         - name: id
           in: path
@@ -165,7 +195,9 @@ paths:
     delete:
       tags: [Menu]
       summary: Remove item (soft delete) (ADMIN/ROOT)
-      security: [{ bearerAuth: [] }]
+      security:
+        - bearerAuth: []
+        - xAccessToken: []
       parameters:
         - name: id
           in: path
@@ -180,7 +212,9 @@ paths:
     get:
       tags: [Users]
       summary: Dados do usuário autenticado
-      security: [{ bearerAuth: [] }]
+      security:
+        - bearerAuth: []
+        - xAccessToken: []
       responses:
         '200':
           description: OK
@@ -195,10 +229,13 @@ paths:
                     email: maria@exemplo.com
                     role: CLIENTE
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
     patch:
       tags: [Users]
       summary: Atualiza dados básicos (confirma senha)
-      security: [{ bearerAuth: [] }]
+      security:
+        - bearerAuth: []
+        - xAccessToken: []
       requestBody:
         required: true
         content:
@@ -217,11 +254,14 @@ paths:
         '400': { $ref: '#/components/responses/BadRequest' }
         '422': { $ref: '#/components/responses/UnprocessableEntity' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
   /api/users/me/change-password:
     post:
       tags: [Users]
       summary: Troca a própria senha
-      security: [{ bearerAuth: [] }]
+      security:
+        - bearerAuth: []
+        - xAccessToken: []
       requestBody:
         required: true
         content:
@@ -238,11 +278,14 @@ paths:
         '400': { $ref: '#/components/responses/BadRequest' }
         '422': { $ref: '#/components/responses/UnprocessableEntity' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
   /api/users:
     get:
       tags: [Users]
       summary: Lista usuários (ADMIN/ROOT)
-      security: [{ bearerAuth: [] }]
+      security:
+        - bearerAuth: []
+        - xAccessToken: []
       parameters:
         - in: query
           name: page
@@ -258,7 +301,9 @@ paths:
     patch:
       tags: [Users]
       summary: Altera role (ROOT)
-      security: [{ bearerAuth: [] }]
+      security:
+        - bearerAuth: []
+        - xAccessToken: []
       parameters:
         - name: id
           in: path
@@ -284,7 +329,9 @@ paths:
     post:
       tags: [Users]
       summary: Redefine senha de usuário (ADMIN/ROOT)
-      security: [{ bearerAuth: [] }]
+      security:
+        - bearerAuth: []
+        - xAccessToken: []
       parameters:
         - name: id
           in: path
@@ -310,7 +357,9 @@ paths:
     delete:
       tags: [Users]
       summary: Desativa usuário (ADMIN/ROOT)
-      security: [{ bearerAuth: [] }]
+      security:
+        - bearerAuth: []
+        - xAccessToken: []
       parameters:
         - name: id
           in: path
@@ -318,6 +367,7 @@ paths:
           schema: { type: string }
       responses:
         '204': { description: Desativado }
+        '400': { $ref: '#/components/responses/BadRequest' }
         '404': { $ref: '#/components/responses/NotFound' }
         '401': { $ref: '#/components/responses/Unauthorized' }
         '403': { $ref: '#/components/responses/Forbidden' }
@@ -325,7 +375,9 @@ paths:
     get:
       tags: [Orders]
       summary: Lista pedidos do usuário autenticado
-      security: [{ bearerAuth: [] }]
+      security:
+        - bearerAuth: []
+        - xAccessToken: []
       responses:
         '200':
           description: OK
@@ -360,7 +412,9 @@ paths:
     post:
       tags: [Orders]
       summary: Cria pedido (mesa obrigatória)
-      security: [{ bearerAuth: [] }]
+      security:
+        - bearerAuth: []
+        - xAccessToken: []
       requestBody:
         required: true
         content:
@@ -385,7 +439,9 @@ paths:
     get:
       tags: [Admin]
       summary: Métricas rápidas (ADMIN/ROOT)
-      security: [{ bearerAuth: [] }]
+      security:
+        - bearerAuth: []
+        - xAccessToken: []
       responses:
         '200':
           description: OK
@@ -403,7 +459,9 @@ paths:
     get:
       tags: [Admin]
       summary: Lista pedidos (ADMIN/ROOT)
-      security: [{ bearerAuth: [] }]
+      security:
+        - bearerAuth: []
+        - xAccessToken: []
       parameters:
         - in: query
           name: status
@@ -448,7 +506,9 @@ paths:
     patch:
       tags: [Admin]
       summary: Atualiza status do pedido
-      security: [{ bearerAuth: [] }]
+      security:
+        - bearerAuth: []
+        - xAccessToken: []
       parameters:
         - name: id
           in: path
@@ -474,7 +534,9 @@ paths:
     delete:
       tags: [Admin]
       summary: Cancela pedido
-      security: [{ bearerAuth: [] }]
+      security:
+        - bearerAuth: []
+        - xAccessToken: []
       parameters:
         - name: id
           in: path
@@ -485,17 +547,41 @@ paths:
         '404': { $ref: '#/components/responses/NotFound' }
         '401': { $ref: '#/components/responses/Unauthorized' }
         '403': { $ref: '#/components/responses/Forbidden' }
-    components:
-      securitySchemes:
-        bearerAuth:
-          type: http
-          scheme: bearer
-          bearerFormat: JWT
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    xAccessToken:
+      type: apiKey
+      in: header
+      name: x-access-token
       schemas:
-        Error:
+    Error:
+      type: object
+      required: [ok, message]
+      properties:
+        ok: { type: boolean, example: false }
+        message: { type: string, example: 'Ocorreu um erro.' }
+        code: { type: string, nullable: true, example: 'UNAUTHORIZED' }
+        details:
           type: object
-          properties:
-            message: { type: string }
+          nullable: true
+          additionalProperties: true
+    ValidationError:
+      type: object
+      required: [ok, message, errors]
+      properties:
+        ok: { type: boolean, example: false }
+        message: { type: string, example: 'Dados inválidos.' }
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              field: { type: string, example: 'email' }
+              message: { type: string, example: 'Email inválido.' }
         RegisterRequest:
           type: object
           required: [name, email, password]
@@ -527,13 +613,14 @@ paths:
             zip_code: { type: string, nullable: true }
         UserUpdate:
           type: object
+          description: Campos opcionais; ao alterar email, envie também password atual.
           properties:
             name: { type: string }
-            email: { type: string }
+            email: { type: string, format: email }
             phone: { type: string }
             address: { type: string }
             zip_code: { type: string }
-            password: { type: string }
+            password: { type: string, description: 'Senha atual para confirmar alterações.' }
         ChangePasswordRequest:
           type: object
           required: [currentPassword, newPassword, confirmPassword]
@@ -604,7 +691,7 @@ paths:
             quantity: { type: integer, minimum: 1 }
         CreateOrderRequest:
           type: object
-          required: [paymentMethod, items]
+          required: [tableNumber, paymentMethod, items]
           properties:
             tableNumber: { type: string, nullable: true }
             paymentMethod: { $ref: '#/components/schemas/PaymentMethod' }
@@ -658,7 +745,7 @@ paths:
               schema: { $ref: '#/components/schemas/Error' }
               examples:
                 exemplo:
-                  value: { message: 'Requisição inválida.' }
+                  value: { ok: false, code: 'BAD_REQUEST', message: 'Requisição inválida.' }
         Unauthorized:
           description: Não autenticado
           content:
@@ -666,7 +753,7 @@ paths:
               schema: { $ref: '#/components/schemas/Error' }
               examples:
                 exemplo:
-                  value: { message: 'Não autenticado.' }
+                  value: { ok: false, code: 'UNAUTHORIZED', message: 'Não autenticado.' }
         Forbidden:
           description: Sem permissão
           content:
@@ -674,7 +761,7 @@ paths:
               schema: { $ref: '#/components/schemas/Error' }
               examples:
                 exemplo:
-                  value: { message: 'Sem permissão.' }
+                  value: { ok: false, code: 'FORBIDDEN', message: 'Sem permissão.' }
         ConflictEmail:
           description: Email já cadastrado
           content:
@@ -682,7 +769,7 @@ paths:
               schema: { $ref: '#/components/schemas/Error' }
               examples:
                 exemplo:
-                  value: { message: 'Email já cadastrado.' }
+                  value: { ok: false, code: 'CONFLICT', message: 'Email já cadastrado.' }
         NotFound:
           description: Recurso não encontrado
           content:
@@ -690,25 +777,16 @@ paths:
               schema: { $ref: '#/components/schemas/Error' }
               examples:
                 exemplo:
-                  value: { message: 'Recurso não encontrado.' }
+                  value: { ok: false, code: 'NOT_FOUND', message: 'Recurso não encontrado.' }
         UnprocessableEntity:
           description: Erro de validação (campos inválidos)
           content:
             application/json:
-              schema:
-                type: object
-                properties:
-                  message: { type: string, example: 'Dados inválidos.' }
-                  errors:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        field: { type: string, example: 'email' }
-                        message: { type: string, example: 'Email inválido.' }
+              schema: { $ref: '#/components/schemas/ValidationError' }
               examples:
                 exemplo:
                   value:
+                    ok: false
                     message: 'Dados inválidos.'
                     errors:
                       - field: 'email'

@@ -1,9 +1,9 @@
 // router principal da API
 import { Router } from 'express'
 import { router as authRouter } from './auth.routes'
-import { router as userRouter } from './profile.routes'
-import { router as menuRouter } from './menu.routes'
-import { router as ordersRouter } from './orders.routes'
+import { router as userRouter } from '../users-profile/routes'
+import { router as menuRouter } from '../menu/routes'
+import { router as ordersRouter } from '../orders/routes'
 import { router as adminRouter } from './metrics.routes'
 import { router as adminOrdersRouter } from './admin.orders.routes'
 import type { Request, Response } from 'express'

@@ -1,13 +1,16 @@
 // rotas administrativas de pedidos: listar, atualizar status e cancelar
 import { Router, type Request, type Response } from 'express'
 import { PrismaClient, OrderStatus } from '@prisma/client'
-import { verifyToken, isAdmin } from '../middlewares/auth'
+import { verifyUser, isAdmin } from '../middlewares/auth'
+import { validateBody } from '../core/validate'
+import { setStatusSchema } from '../validation/admin.schemas'
+import { sendError, sendSuccess } from '../core/responses'
 
 const prisma = new PrismaClient()
 export const router = Router()
 
 // GET /api/admin/orders - lista pedidos com usuario e itens
-router.get('/', verifyToken, isAdmin, async (req: Request, res: Response) => {
+router.get('/', verifyUser, isAdmin, async (req: Request, res: Response) => {
   const { status } = req.query as { status?: string }
   const where: any = {}
   if (status) where.status = status // sera validado pelo banco quando enum existir
@@ -24,32 +27,28 @@ router.get('/', verifyToken, isAdmin, async (req: Request, res: Response) => {
 })
 
 // PATCH /api/admin/orders/:id/status - atualiza status do pedido
-router.patch('/:id/status', verifyToken, isAdmin, async (req: Request, res: Response) => {
+router.patch('/:id/status', verifyUser, isAdmin, validateBody(setStatusSchema), async (req: Request, res: Response) => {
   const { id } = req.params
-  const { status } = req.body as { status?: OrderStatus | string }
-  const allowed = Object.values(OrderStatus)
-  if (!status || !allowed.includes(status as OrderStatus)) {
-    return res.status(400).json({ message: 'Status invalido.' })
-  }
+  const { status } = req.body as { status: OrderStatus }
   try {
     const updated = await prisma.order.update({ where: { id }, data: { status: status as OrderStatus } })
-    return res.json({ id: updated.id, status: (updated as any).status })
+    return sendSuccess(res, { id: updated.id, status: (updated as any).status })
   } catch (e) {
-    return res.status(404).json({ message: 'Pedido nao encontrado.' })
+    return sendError(res, 'Pedido nao encontrado.', 404)
   }
 })
 
 // DELETE /api/admin/orders/:id - cancela um pedido
-router.delete('/:id', verifyToken, isAdmin, async (req: Request, res: Response) => {
+router.delete('/:id', verifyUser, isAdmin, async (req: Request, res: Response) => {
   const { id } = req.params
   try {
     const updated = await prisma.order.update({
       where: { id },
       data: { cancelled_at: new Date(), status: OrderStatus.CANCELADO }
     })
-    return res.json({ id: updated.id, cancelled_at: updated.cancelled_at })
+    return sendSuccess(res, { id: updated.id, cancelled_at: updated.cancelled_at })
   } catch (e) {
-    return res.status(404).json({ message: 'Pedido nao encontrado.' })
+    return sendError(res, 'Pedido nao encontrado.', 404)
   }
 })
 

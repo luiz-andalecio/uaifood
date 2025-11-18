@@ -21,28 +21,56 @@ app.use(cors()) // habilita CORS para o frontend
 app.use(express.json()) // payload JSON
 app.use(morgan('dev')) // logs de requisicoes
 
-// documentação Swagger (OpenAPI) carregada via YAML
+// documentação Swagger (OpenAPI) carregada via YAML (suporta arquivo único ou pasta com múltiplos arquivos e $ref)
 let swaggerDocument: any | null = null
 try {
-  const candidates = [
-    path.join(__dirname, 'swagger.yaml'), // dev com ts-node (src)
-    path.join(__dirname, '../src/swagger.yaml'), // prod compilado (dist -> src)
-    path.join(process.cwd(), 'backend', 'src', 'swagger.yaml'),
-    path.join(process.cwd(), 'src', 'swagger.yaml'),
-    path.join(process.cwd(), 'swagger.yaml'),
+  // Primeiro tenta o modelo multi-arquivos: backend/src/swagger/index.yaml (ou caminhos equivalentes)
+  const folderCandidates = [
+    path.join(__dirname, 'swagger', 'index.yaml'), // dev com ts-node (src)
+    path.join(__dirname, '../src/swagger', 'index.yaml'), // prod compilado (dist -> src)
+    path.join(process.cwd(), 'backend', 'src', 'swagger', 'index.yaml'),
+    path.join(process.cwd(), 'src', 'swagger', 'index.yaml'),
   ]
+  const folderFound = folderCandidates.find((p) => fs.existsSync(p))
 
-  const found = candidates.find((p) => fs.existsSync(p))
-  if (found) {
-    swaggerDocument = YAML.parse(fs.readFileSync(found, 'utf-8'))
-    app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
-    // rota auxiliar para depuração do documento
-    app.get('/docs.json', (_req, res) => res.json(swaggerDocument))
-    // garantir acesso com barra final
+  if (folderFound) {
+    const folder = path.dirname(folderFound)
+    // Servimos os arquivos YAML estaticamente em /docs-spec
+    app.use('/docs-spec', express.static(folder))
+    // E a UI do Swagger consome o index.yaml via URL (assim o Swagger resolve $ref relativos via HTTP)
+    app.use('/docs', swaggerUi.serve, swaggerUi.setup(undefined, { swaggerUrl: '/docs-spec/index.yaml' }))
+    // endpoint opcional para obter o index bruto (sem resolver refs)
+    app.get('/docs.json', (_req, res) => {
+      try {
+        const raw = fs.readFileSync(folderFound, 'utf-8')
+        const parsed = YAML.parse(raw)
+        res.json(parsed)
+      } catch (e) {
+        res.status(500).json({ ok: false, message: 'Falha ao ler index.yaml', error: String(e) })
+      }
+    })
     app.get('/docs/', (_req, res) => res.redirect('/docs'))
-    logger.info({ swagger: found }, 'Swagger carregado')
+    logger.info({ swaggerIndex: folderFound }, 'Swagger (multi-arquivos) carregado')
   } else {
-    logger.warn('Arquivo swagger.yaml não encontrado em caminhos conhecidos. /docs indisponível.')
+    // Fallback: arquivo único swagger.yaml em caminhos conhecidos
+    const singleFileCandidates = [
+      path.join(__dirname, 'swagger.yaml'), // dev com ts-node (src)
+      path.join(__dirname, '../src/swagger.yaml'), // prod compilado (dist -> src)
+      path.join(process.cwd(), 'backend', 'src', 'swagger.yaml'),
+      path.join(process.cwd(), 'src', 'swagger.yaml'),
+      path.join(process.cwd(), 'swagger.yaml'),
+    ]
+
+    const found = singleFileCandidates.find((p) => fs.existsSync(p))
+    if (found) {
+      swaggerDocument = YAML.parse(fs.readFileSync(found, 'utf-8'))
+      app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
+      app.get('/docs.json', (_req, res) => res.json(swaggerDocument))
+      app.get('/docs/', (_req, res) => res.redirect('/docs'))
+      logger.info({ swagger: found }, 'Swagger (arquivo único) carregado')
+    } else {
+      logger.warn('Arquivo/pasta do Swagger não encontrado. /docs indisponível.')
+    }
   }
 } catch (err) {
   logger.error({ err }, 'Falha ao carregar documentação OpenAPI')

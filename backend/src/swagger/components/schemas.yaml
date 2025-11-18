@@ -1,0 +1,179 @@
+Error:
+  type: object
+  required: [ok, message]
+  properties:
+    ok: { type: boolean, example: false }
+    message: { type: string, example: 'Ocorreu um erro.' }
+    code: { type: string, nullable: true, example: 'UNAUTHORIZED' }
+    details:
+      type: object
+      nullable: true
+      additionalProperties: true
+ValidationError:
+  type: object
+  required: [ok, message, errors]
+  properties:
+    ok: { type: boolean, example: false }
+    message: { type: string, example: 'Dados inválidos.' }
+    errors:
+      type: array
+      items:
+        type: object
+        properties:
+          field: { type: string, example: 'email' }
+          message: { type: string, example: 'Email inválido.' }
+RegisterRequest:
+  type: object
+  required: [name, email, password]
+  properties:
+    name: { type: string }
+    email: { type: string, format: email }
+    password: { type: string, format: password }
+    phone: { type: string }
+LoginRequest:
+  type: object
+  required: [email, password]
+  properties:
+    email: { type: string, format: email }
+    password: { type: string }
+LoginResponse:
+  type: object
+  properties:
+    token: { type: string }
+    user: { $ref: '#/User' }
+User:
+  type: object
+  properties:
+    id: { type: string }
+    name: { type: string }
+    email: { type: string }
+    role: { type: string, enum: [CLIENTE, ADMIN, ROOT] }
+    phone: { type: string, nullable: true }
+    address: { type: string, nullable: true }
+    zip_code: { type: string, nullable: true }
+UserUpdate:
+  type: object
+  description: Campos opcionais; ao alterar email, envie também password atual.
+  properties:
+    name: { type: string }
+    email: { type: string, format: email }
+    phone: { type: string }
+    address: { type: string }
+    zip_code: { type: string }
+    password: { type: string, description: 'Senha atual para confirmar alterações.' }
+ChangePasswordRequest:
+  type: object
+  required: [currentPassword, newPassword, confirmPassword]
+  properties:
+    currentPassword: { type: string }
+    newPassword: { type: string }
+    confirmPassword: { type: string }
+RoleUpdate:
+  type: object
+  required: [role]
+  properties:
+    role: { type: string, enum: [CLIENTE, ADMIN, ROOT] }
+AdminResetPassword:
+  type: object
+  required: [password]
+  properties:
+    password: { type: string }
+Category:
+  type: object
+  properties:
+    id: { type: string }
+    name: { type: string }
+Item:
+  type: object
+  properties:
+    id: { type: string }
+    name: { type: string }
+    price: { type: number, format: float }
+    description: { type: string, nullable: true }
+    image_url: { type: string, nullable: true }
+    is_active: { type: boolean }
+CategoryWithItems:
+  allOf:
+    - $ref: '#/Category'
+    - type: object
+      properties:
+        items:
+          type: array
+          items: { $ref: '#/Item' }
+CreateItemRequest:
+  type: object
+  required: [name, price, categoryId]
+  properties:
+    name: { type: string }
+    price: { type: number, format: float, minimum: 0 }
+    categoryId: { type: string }
+    description: { type: string }
+    image_url: { type: string }
+UpdateItemRequest:
+  type: object
+  properties:
+    name: { type: string }
+    price: { type: number, format: float, minimum: 0 }
+    description: { type: string }
+    image_url: { type: string }
+    is_active: { type: boolean }
+PaymentMethod:
+  type: string
+  enum: [DINHEIRO, DEBITO, CREDITO, PIX]
+OrderStatus:
+  type: string
+  enum: [PENDENTE, PREPARANDO, PRONTO, ENTREGUE, CANCELADO]
+OrderItemInput:
+  type: object
+  required: [itemId, quantity]
+  properties:
+    itemId: { type: string }
+    quantity: { type: integer, minimum: 1 }
+CreateOrderRequest:
+  type: object
+  required: [tableNumber, paymentMethod, items]
+  properties:
+    tableNumber: { type: string, nullable: true }
+    paymentMethod: { $ref: '#/PaymentMethod' }
+    items:
+      type: array
+      items: { $ref: '#/OrderItemInput' }
+OrderItem:
+  type: object
+  properties:
+    id: { type: string }
+    quantity: { type: integer }
+    unit_price: { type: number, format: float }
+    total_price: { type: number, format: float }
+    item: { $ref: '#/Item' }
+Order:
+  type: object
+  properties:
+    id: { type: string }
+    user_id: { type: string }
+    table_number: { type: string, nullable: true }
+    status: { $ref: '#/OrderStatus' }
+    payment_method: { $ref: '#/PaymentMethod' }
+    subtotal: { type: number, format: float }
+    tax: { type: number, format: float }
+    total: { type: number, format: float }
+    created_at: { type: string, format: date-time }
+OrderWithItems:
+  allOf:
+    - $ref: '#/Order'
+    - type: object
+      properties:
+        items:
+          type: array
+          items: { $ref: '#/OrderItem' }
+OrderWithItemsAdmin:
+  allOf:
+    - $ref: '#/OrderWithItems'
+    - type: object
+      properties:
+        user: { $ref: '#/User' }
+SetOrderStatusRequest:
+  type: object
+  required: [status]
+  properties:
+    status: { $ref: '#/OrderStatus' }

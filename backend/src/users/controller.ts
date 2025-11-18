@@ -44,7 +44,7 @@ export async function changeMyPassword(req: Request, res: Response) {
   const ok = await bcrypt.compare(currentPassword, user.password_hash)
   if (!ok) return sendError(res, 'Senha atual inválida.', 401)
   const password_hash = await bcrypt.hash(newPassword, 10)
-  await updateUser(userId, { } as any) // placeholder para manter assinatura consistente
+  await updateUser(userId, {} as any) // placeholder para manter assinatura consistente
   // atualiza via prisma diretamente (evitando alterar model generico)
   // ideal seria ter um metodo especifico no model, mantido simples aqui:
   const { prisma } = await import('../core/prisma')

@@ -1,0 +1,112 @@
+adminDashboard:
+  get:
+    tags: [Admin]
+    summary: Métricas rápidas (ADMIN/ROOT)
+    security:
+      - bearerAuth: []
+      - xAccessToken: []
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                users: { type: integer, example: 42 }
+                items: { type: integer, example: 18 }
+                orders: { type: integer, example: 105 }
+      '401': { $ref: '../components/responses.yaml#/Unauthorized' }
+      '403': { $ref: '../components/responses.yaml#/Forbidden' }
+adminOrdersList:
+  get:
+    tags: [Admin]
+    summary: Lista pedidos (ADMIN/ROOT)
+    security:
+      - bearerAuth: []
+      - xAccessToken: []
+    parameters:
+      - in: query
+        name: status
+        schema: { $ref: '../components/schemas.yaml#/OrderStatus' }
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                orders:
+                  type: array
+                  items: { $ref: '../components/schemas.yaml#/OrderWithItemsAdmin' }
+            examples:
+              exemplo:
+                value:
+                  orders:
+                    - id: ord-123
+                      status: PREPARANDO
+                      table_number: '5'
+                      payment_method: PIX
+                      total: 33.9
+                      created_at: '2025-11-12T12:00:00Z'
+                      user:
+                        id: uuid-user
+                        name: Maria Silva
+                        email: maria@exemplo.com
+                      items:
+                        - id: oi-1
+                          quantity: 2
+                          unit_price: 6.5
+                          total_price: 13.0
+                          item:
+                            id: it-coca
+                            name: Coca-Cola Lata
+                            price: 6.5
+      '401': { $ref: '../components/responses.yaml#/Unauthorized' }
+      '403': { $ref: '../components/responses.yaml#/Forbidden' }
+adminOrdersSetStatus:
+  patch:
+    tags: [Admin]
+    summary: Atualiza status do pedido
+    security:
+      - bearerAuth: []
+      - xAccessToken: []
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas.yaml#/SetOrderStatusRequest' }
+          examples:
+            exemplo:
+              value:
+                status: PRONTO
+    responses:
+      '200': { description: OK }
+      '400': { $ref: '../components/responses.yaml#/BadRequest' }
+      '404': { $ref: '../components/responses.yaml#/NotFound' }
+      '422': { $ref: '../components/responses.yaml#/UnprocessableEntity' }
+      '401': { $ref: '../components/responses.yaml#/Unauthorized' }
+      '403': { $ref: '../components/responses.yaml#/Forbidden' }
+adminOrdersDelete:
+  delete:
+    tags: [Admin]
+    summary: Cancela pedido
+    security:
+      - bearerAuth: []
+      - xAccessToken: []
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    responses:
+      '204': { description: Cancelado }
+      '404': { $ref: '../components/responses.yaml#/NotFound' }
+      '401': { $ref: '../components/responses.yaml#/Unauthorized' }
+      '403': { $ref: '../components/responses.yaml#/Forbidden' }

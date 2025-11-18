@@ -1,0 +1,101 @@
+menuList:
+  get:
+    tags: [Menu]
+    summary: Lista categorias e itens ativos
+    security: []
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                categories:
+                  type: array
+                  items: { $ref: '../components/schemas.yaml#/CategoryWithItems' }
+            examples:
+              exemplo:
+                value:
+                  categories:
+                    - id: cat-bebidas
+                      name: Bebidas
+                      items:
+                        - id: it-coca
+                          name: Coca-Cola Lata
+                          price: 6.5
+                          description: Refrigerante 350ml
+                          is_active: true
+menuCreateItem:
+  post:
+    tags: [Menu]
+    summary: Cria item (ADMIN/ROOT)
+    security:
+      - bearerAuth: []
+      - xAccessToken: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas.yaml#/CreateItemRequest' }
+          examples:
+            exemplo:
+              value:
+                name: Suco de Laranja
+                price: 8.0
+                categoryId: cat-bebidas
+                description: Suco natural 300ml
+                image_url: https://cdn.exemplo.com/sucos/laranja.jpg
+    responses:
+      '201':
+        description: Criado
+        content:
+          application/json:
+            schema: { $ref: '../components/schemas.yaml#/Item' }
+      '422': { $ref: '../components/responses.yaml#/UnprocessableEntity' }
+      '401': { $ref: '../components/responses.yaml#/Unauthorized' }
+      '403': { $ref: '../components/responses.yaml#/Forbidden' }
+menuItemById:
+  patch:
+    tags: [Menu]
+    summary: Atualiza item (ADMIN/ROOT)
+    security:
+      - bearerAuth: []
+      - xAccessToken: []
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas.yaml#/UpdateItemRequest' }
+          examples:
+            exemplo:
+              value:
+                price: 7.5
+                description: Suco natural 300ml (sem açúcar)
+    responses:
+      '200': { description: OK }
+      '404': { $ref: '../components/responses.yaml#/NotFound' }
+      '422': { $ref: '../components/responses.yaml#/UnprocessableEntity' }
+      '401': { $ref: '../components/responses.yaml#/Unauthorized' }
+      '403': { $ref: '../components/responses.yaml#/Forbidden' }
+  delete:
+    tags: [Menu]
+    summary: Remove item (soft delete) (ADMIN/ROOT)
+    security:
+      - bearerAuth: []
+      - xAccessToken: []
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    responses:
+      '204': { description: Removido }
+      '404': { $ref: '../components/responses.yaml#/NotFound' }
+      '401': { $ref: '../components/responses.yaml#/Unauthorized' }
+      '403': { $ref: '../components/responses.yaml#/Forbidden' }

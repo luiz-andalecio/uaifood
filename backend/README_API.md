@@ -2,6 +2,12 @@
 
 > 📖 Veja instruções detalhadas de autenticação em [docs/auth.md](docs/auth.md)
 
+Documentação OpenAPI (Swagger) modular:
+- Os arquivos da especificação agora estão em `src/swagger/` (com `index.yaml`, `components/` e `paths/`).
+- A UI está disponível em `/docs` quando o backend está rodando.
+
+> 📚 Guia completo do Swagger: [docs/swagger.md](docs/swagger.md)
+
 Documentação resumida dos endpoints (detalhes completos e exemplos em `/docs`).
 
 ## Autenticação (Auth)

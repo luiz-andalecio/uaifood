@@ -1,0 +1,84 @@
+openapi: 3.0.3
+info:
+  title: UAIFood API
+  version: 1.0.0
+  description: |
+    API do UAIFood (YAML). Segurança JWT via Bearer JWT.
+    Também é aceito o cabeçalho `x-access-token` como alternativa (estilo jwt-example).
+
+    ## Autenticação
+    Esta API exige autenticação para a maioria dos endpoints. Você pode enviar o token JWT de duas formas:
+
+    1) Header Authorization (preferencial)
+
+    ```bash
+    curl -H "Authorization: Bearer <seu_token>" http://localhost:3333/api/users/me
+    ```
+
+    2) Header x-access-token (compatibilidade com jwt-example)
+
+    ```bash
+    curl -H "x-access-token: <seu_token>" http://localhost:3333/api/users/me
+    ```
+
+    Para obter o token, faça login em `/api/auth/login`.
+servers:
+  - url: http://localhost:3333
+    description: Desenvolvimento local
+security:
+  - bearerAuth: []
+  - xAccessToken: []
+tags:
+  - name: Health
+  - name: Auth
+  - name: Menu
+  - name: Users
+  - name: Orders
+  - name: Admin
+paths:
+  /health:
+    $ref: './paths/health.yaml#/health'
+
+  /api/auth/register:
+    $ref: './paths/auth.yaml#/authRegister'
+  /api/auth/login:
+    $ref: './paths/auth.yaml#/authLogin'
+
+  /api/menu:
+    $ref: './paths/menu.yaml#/menuList'
+  /api/menu/items:
+    $ref: './paths/menu.yaml#/menuCreateItem'
+  /api/menu/items/{id}:
+    $ref: './paths/menu.yaml#/menuItemById'
+
+  /api/users/me:
+    $ref: './paths/users.yaml#/usersMe'
+  /api/users/me/change-password:
+    $ref: './paths/users.yaml#/usersChangePassword'
+  /api/users:
+    $ref: './paths/users.yaml#/usersList'
+  /api/users/{id}/role:
+    $ref: './paths/users.yaml#/usersSetRole'
+  /api/users/{id}/password:
+    $ref: './paths/users.yaml#/usersResetPassword'
+  /api/users/{id}:
+    $ref: './paths/users.yaml#/usersDelete'
+
+  /api/orders:
+    $ref: './paths/orders.yaml#/orders'
+
+  /api/admin/dashboard:
+    $ref: './paths/admin.yaml#/adminDashboard'
+  /api/admin/orders:
+    $ref: './paths/admin.yaml#/adminOrdersList'
+  /api/admin/orders/{id}/status:
+    $ref: './paths/admin.yaml#/adminOrdersSetStatus'
+  /api/admin/orders/{id}:
+    $ref: './paths/admin.yaml#/adminOrdersDelete'
+components:
+  securitySchemes:
+    $ref: './components/security.yaml'
+  schemas:
+    $ref: './components/schemas.yaml'
+  responses:
+    $ref: './components/responses.yaml'

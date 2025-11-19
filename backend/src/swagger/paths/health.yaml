@@ -1,0 +1,14 @@
+health:
+  get:
+    tags: [Health]
+    summary: Verifica saúde do servidor
+    security: []
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status: { type: string, example: ok }

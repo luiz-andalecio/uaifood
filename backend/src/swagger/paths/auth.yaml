@@ -1,0 +1,55 @@
+authRegister:
+  post:
+    tags: [Auth]
+    summary: Cria usuário cliente
+    security: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas.yaml#/RegisterRequest' }
+          examples:
+            exemplo:
+              value:
+                name: Maria Silva
+                email: maria@exemplo.com
+                password: senhaForte123
+                phone: "+5531999999999"
+    responses:
+      '201': { description: Criado }
+      '400': { $ref: '../components/responses.yaml#/BadRequest' }
+      '422': { $ref: '../components/responses.yaml#/UnprocessableEntity' }
+      '409': { $ref: '../components/responses.yaml#/ConflictEmail' }
+authLogin:
+  post:
+    tags: [Auth]
+    summary: Autentica usuário e retorna JWT
+    security: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas.yaml#/LoginRequest' }
+          examples:
+            exemplo:
+              value:
+                email: root@uaifood.com
+                password: root123
+    responses:
+      '200':
+        description: Autenticado
+        content:
+          application/json:
+            schema: { $ref: '../components/schemas.yaml#/LoginResponse' }
+            examples:
+              sucesso:
+                value:
+                  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                  user:
+                    id: uuid-user
+                    name: Root
+                    email: root@uaifood.com
+                    role: ROOT
+      '400': { $ref: '../components/responses.yaml#/BadRequest' }
+      '422': { $ref: '../components/responses.yaml#/UnprocessableEntity' }
+      '401': { $ref: '../components/responses.yaml#/Unauthorized' }

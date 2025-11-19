@@ -1,0 +1,112 @@
+// Esquema Prisma para UAIFood (PostgreSQL)
+// Comentários em português para facilitar leitura
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  CLIENTE
+  ADMIN
+  ROOT
+}
+
+enum PaymentMethod {
+  DINHEIRO
+  DEBITO
+  CREDITO
+  PIX
+}
+
+enum OrderStatus {
+  PENDENTE
+  PREPARANDO
+  PRONTO
+  ENTREGUE
+  CANCELADO
+}
+
+model User {
+  id            String   @id @default(uuid())
+  name          String
+  email         String   @unique
+  password_hash String
+  phone         String?
+  address       String?
+  zip_code      String?
+  role          UserRole @default(CLIENTE)
+  is_active     Boolean  @default(true)
+  avatar_url    String?
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  deleted_at DateTime?
+
+  // relacionamento com pedidos
+  orders     Order[]
+}
+
+model Category {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String?
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  items Item[]
+}
+
+model Item {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  price       Decimal  @db.Decimal(10, 2)
+  image_url   String?
+  is_active   Boolean  @default(true)
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  deleted_at DateTime?
+
+  category_id String?
+  category    Category? @relation(fields: [category_id], references: [id])
+
+  order_items OrderItem[]
+}
+
+model Order {
+  id             String        @id @default(uuid())
+  user_id        String
+  user           User          @relation(fields: [user_id], references: [id])
+  table_number   String?
+  payment_method PaymentMethod?
+  status         OrderStatus   @default(PENDENTE)
+  subtotal       Decimal       @db.Decimal(10, 2)
+  tax            Decimal?      @db.Decimal(10, 2)
+  total          Decimal       @db.Decimal(10, 2)
+  created_at     DateTime      @default(now())
+  updated_at     DateTime      @updatedAt
+  cancelled_at   DateTime?
+
+  items OrderItem[]
+}
+
+model OrderItem {
+  id          String   @id @default(uuid())
+  order_id    String
+  order       Order    @relation(fields: [order_id], references: [id])
+  item_id     String
+  item        Item     @relation(fields: [item_id], references: [id])
+  quantity    Int
+  unit_price  Decimal  @db.Decimal(10, 2)
+  total_price Decimal  @db.Decimal(10, 2)
+  observations String?
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+}

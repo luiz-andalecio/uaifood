@@ -1,0 +1,31 @@
+// Rodapé com links e contato
+import { UtensilsCrossed, Link2, Mail, MapPin, Phone } from 'lucide-react'
+
+export function Footer() {
+  return (
+    <footer className="mt-12 border-t bg-white/70">
+      <div className="max-w-6xl mx-auto px-4 py-10 grid md:grid-cols-3 gap-8 text-sm">
+        <div>
+          <div className="text-xl font-bold mb-2 inline-flex items-center gap-2">
+            <UtensilsCrossed size={20} /> UAIFood
+          </div>
+          <p>Sabor de Minas na palma da sua mão. Comida caseira, feita com carinho.</p>
+        </div>
+        <div>
+          <h4 className="font-semibold mb-2 inline-flex items-center gap-2"><Link2 size={16} /> Links Rápidos</h4>
+          <ul className="space-y-1">
+            <li><a href="/" className="hover:underline inline-flex items-center gap-1"><Link2 size={14} /> Início</a></li>
+            <li><a href="/cardapio" className="hover:underline inline-flex items-center gap-1"><UtensilsCrossed size={14} /> Cardápio</a></li>
+            <li><a href="/sobre" className="hover:underline inline-flex items-center gap-1"><Mail size={14} /> Sobre</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 className="font-semibold mb-2 inline-flex items-center gap-2"><Mail size={16} /> Contato</h4>
+          <p className="inline-flex items-center gap-1"><MapPin size={14} /> Rua das Flores, 123 - Belo Horizonte</p>
+          <p className="inline-flex items-center gap-1"><Phone size={14} /> (31) 3333-4444</p>
+        </div>
+      </div>
+      <div className="text-center text-xs py-4">© 2025 UAIFood. Todos os direitos reservados.</div>
+    </footer>
+  )
+}

@@ -1,0 +1,62 @@
+orders:
+  get:
+    tags: [Orders]
+    summary: Lista pedidos do usuário autenticado
+    security:
+      - xAccessToken: []
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                orders:
+                  type: array
+                  items: { $ref: '../components/schemas.yaml#/OrderWithItems' }
+            examples:
+              exemplo:
+                value:
+                  orders:
+                    - id: ord-123
+                      status: PENDENTE
+                      table_number: '5'
+                      payment_method: PIX
+                      total: 33.9
+                      created_at: '2025-11-12T12:00:00Z'
+                      items:
+                        - id: oi-1
+                          quantity: 2
+                          unit_price: 6.5
+                          total_price: 13.0
+                          item:
+                            id: it-coca
+                            name: Coca-Cola Lata
+                            price: 6.5
+      '401': { $ref: '../components/responses.yaml#/Unauthorized' }
+  post:
+    tags: [Orders]
+    summary: Cria pedido (mesa obrigatória)
+    security:
+      - xAccessToken: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas.yaml#/CreateOrderRequest' }
+          examples:
+            exemplo:
+              value:
+                tableNumber: '7'
+                paymentMethod: PIX
+                items:
+                  - itemId: it-coca
+                    quantity: 2
+                  - itemId: it-burguer
+                    quantity: 1
+    responses:
+      '201': { description: Criado }
+      '400': { $ref: '../components/responses.yaml#/BadRequest' }
+      '422': { $ref: '../components/responses.yaml#/UnprocessableEntity' }
+      '401': { $ref: '../components/responses.yaml#/Unauthorized' }

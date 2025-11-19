@@ -1,0 +1,156 @@
+usersMe:
+  get:
+    tags: [Users]
+    summary: Dados do usuário autenticado
+    security:
+      - xAccessToken: []
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema: { $ref: '../components/schemas.yaml#/User' }
+            examples:
+              exemplo:
+                value:
+                  id: uuid-user
+                  name: Maria Silva
+                  email: maria@exemplo.com
+                  role: CLIENTE
+      '401': { $ref: '../components/responses.yaml#/Unauthorized' }
+      '404': { $ref: '../components/responses.yaml#/NotFound' }
+  patch:
+    tags: [Users]
+    summary: Atualiza dados básicos (confirma senha)
+    security:
+      - xAccessToken: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas.yaml#/UserUpdate' }
+          examples:
+            exemplo:
+              value:
+                name: Maria S.
+                phone: +5531888888888
+                address: Rua Exemplo, 123
+                zip_code: 30100-000
+                password: senhaForte123
+    responses:
+      '200': { description: Atualizado }
+      '400': { $ref: '../components/responses.yaml#/BadRequest' }
+      '422': { $ref: '../components/responses.yaml#/UnprocessableEntity' }
+      '401': { $ref: '../components/responses.yaml#/Unauthorized' }
+      '404': { $ref: '../components/responses.yaml#/NotFound' }
+usersChangePassword:
+  post:
+    tags: [Users]
+    summary: Troca a própria senha
+    security:
+      - xAccessToken: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas.yaml#/ChangePasswordRequest' }
+          examples:
+            exemplo:
+              value:
+                currentPassword: senhaAntiga123
+                newPassword: novaSenhaSegura456
+                confirmPassword: novaSenhaSegura456
+    responses:
+      '204': { description: Senha alterada }
+      '400': { $ref: '../components/responses.yaml#/BadRequest' }
+      '422': { $ref: '../components/responses.yaml#/UnprocessableEntity' }
+      '401': { $ref: '../components/responses.yaml#/Unauthorized' }
+      '404': { $ref: '../components/responses.yaml#/NotFound' }
+usersList:
+  get:
+    tags: [Users]
+    summary: Lista usuários (ADMIN/ROOT)
+    security:
+      - xAccessToken: []
+    parameters:
+      - in: query
+        name: page
+        schema: { type: integer, minimum: 1, example: 1 }
+      - in: query
+        name: pageSize
+        schema: { type: integer, minimum: 1, maximum: 100, example: 20 }
+    responses:
+      '200': { description: OK }
+      '401': { $ref: '../components/responses.yaml#/Unauthorized' }
+      '403': { $ref: '../components/responses.yaml#/Forbidden' }
+usersSetRole:
+  patch:
+    tags: [Users]
+    summary: Altera role (ROOT)
+    security:
+      - xAccessToken: []
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas.yaml#/RoleUpdate' }
+          examples:
+            exemplo:
+              value:
+                role: ADMIN
+    responses:
+      '200': { description: OK }
+      '400': { $ref: '../components/responses.yaml#/BadRequest' }
+      '404': { $ref: '../components/responses.yaml#/NotFound' }
+      '422': { $ref: '../components/responses.yaml#/UnprocessableEntity' }
+      '401': { $ref: '../components/responses.yaml#/Unauthorized' }
+      '403': { $ref: '../components/responses.yaml#/Forbidden' }
+usersResetPassword:
+  post:
+    tags: [Users]
+    summary: Redefine senha de usuário (ADMIN/ROOT)
+    security:
+      - xAccessToken: []
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas.yaml#/AdminResetPassword' }
+          examples:
+            exemplo:
+              value:
+                password: NovaSenha123!
+    responses:
+      '200': { description: OK }
+      '400': { $ref: '../components/responses.yaml#/BadRequest' }
+      '404': { $ref: '../components/responses.yaml#/NotFound' }
+      '422': { $ref: '../components/responses.yaml#/UnprocessableEntity' }
+      '401': { $ref: '../components/responses.yaml#/Unauthorized' }
+      '403': { $ref: '../components/responses.yaml#/Forbidden' }
+usersDelete:
+  delete:
+    tags: [Users]
+    summary: Desativa usuário (ADMIN/ROOT)
+    security:
+      - xAccessToken: []
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    responses:
+      '204': { description: Desativado }
+      '400': { $ref: '../components/responses.yaml#/BadRequest' }
+      '404': { $ref: '../components/responses.yaml#/NotFound' }
+      '401': { $ref: '../components/responses.yaml#/Unauthorized' }
+      '403': { $ref: '../components/responses.yaml#/Forbidden' }

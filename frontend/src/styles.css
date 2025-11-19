@@ -1,0 +1,6 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Estilos globais simples para começar */
+body { @apply bg-primary text-gray-800; }

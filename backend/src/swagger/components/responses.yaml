@@ -1,0 +1,55 @@
+BadRequest:
+  description: Requisição inválida
+  content:
+    application/json:
+      schema: { $ref: './schemas.yaml#/Error' }
+      examples:
+        exemplo:
+          value: { ok: false, code: 'BAD_REQUEST', message: 'Requisição inválida.' }
+Unauthorized:
+  description: Não autenticado
+  content:
+    application/json:
+      schema: { $ref: './schemas.yaml#/Error' }
+      examples:
+        exemplo:
+          value: { ok: false, code: 'UNAUTHORIZED', message: 'Não autenticado.' }
+Forbidden:
+  description: Sem permissão
+  content:
+    application/json:
+      schema: { $ref: './schemas.yaml#/Error' }
+      examples:
+        exemplo:
+          value: { ok: false, code: 'FORBIDDEN', message: 'Sem permissão.' }
+ConflictEmail:
+  description: Email já cadastrado
+  content:
+    application/json:
+      schema: { $ref: './schemas.yaml#/Error' }
+      examples:
+        exemplo:
+          value: { ok: false, code: 'CONFLICT', message: 'Email já cadastrado.' }
+NotFound:
+  description: Recurso não encontrado
+  content:
+    application/json:
+      schema: { $ref: './schemas.yaml#/Error' }
+      examples:
+        exemplo:
+          value: { ok: false, code: 'NOT_FOUND', message: 'Recurso não encontrado.' }
+UnprocessableEntity:
+  description: Erro de validação (campos inválidos)
+  content:
+    application/json:
+      schema: { $ref: './schemas.yaml#/ValidationError' }
+      examples:
+        exemplo:
+          value:
+            ok: false
+            message: 'Dados inválidos.'
+            errors:
+              - field: 'email'
+                message: 'Email inválido.'
+              - field: 'password'
+                message: 'Senha deve ter pelo menos 8 caracteres.'

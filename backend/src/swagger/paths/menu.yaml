@@ -31,7 +31,6 @@ menuCreateItem:
     tags: [Menu]
     summary: Cria item (ADMIN/ROOT)
     security:
-      - bearerAuth: []
       - xAccessToken: []
     requestBody:
       required: true
@@ -60,7 +59,6 @@ menuItemById:
     tags: [Menu]
     summary: Atualiza item (ADMIN/ROOT)
     security:
-      - bearerAuth: []
       - xAccessToken: []
     parameters:
       - name: id
@@ -87,7 +85,6 @@ menuItemById:
     tags: [Menu]
     summary: Remove item (soft delete) (ADMIN/ROOT)
     security:
-      - bearerAuth: []
       - xAccessToken: []
     parameters:
       - name: id

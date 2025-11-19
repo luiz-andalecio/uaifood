@@ -3,7 +3,6 @@ adminDashboard:
     tags: [Admin]
     summary: Métricas rápidas (ADMIN/ROOT)
     security:
-      - bearerAuth: []
       - xAccessToken: []
     responses:
       '200':
@@ -23,7 +22,6 @@ adminOrdersList:
     tags: [Admin]
     summary: Lista pedidos (ADMIN/ROOT)
     security:
-      - bearerAuth: []
       - xAccessToken: []
     parameters:
       - in: query
@@ -70,7 +68,6 @@ adminOrdersSetStatus:
     tags: [Admin]
     summary: Atualiza status do pedido
     security:
-      - bearerAuth: []
       - xAccessToken: []
     parameters:
       - name: id
@@ -98,7 +95,6 @@ adminOrdersDelete:
     tags: [Admin]
     summary: Cancela pedido
     security:
-      - bearerAuth: []
       - xAccessToken: []
     parameters:
       - name: id

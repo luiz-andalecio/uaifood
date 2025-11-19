@@ -1,9 +1,8 @@
 # Autenticação da UAIFood API
 
-A UAIFood API utiliza JWT para autenticação. Você pode enviar o token por dois headers diferentes:
+A UAIFood API utiliza JWT para autenticação. O backend aceita o token exclusivamente pelo header:
 
-- Preferencial: `Authorization: Bearer <token>`
-- Compatível: `x-access-token: <token>` (padrão do exemplo jwt-example)
+- `x-access-token: <token>`
 
 Obtendo o token:
 1. Faça login em `POST /api/auth/login` com seu email e senha.
@@ -12,12 +11,6 @@ Obtendo o token:
 Exemplos de uso
 
 ```bash
-# Authorization Bearer (preferencial)
-curl -s \
-  -H "Authorization: Bearer $TOKEN" \
-  http://localhost:3333/api/users/me
-
-# x-access-token (compatível)
 curl -s \
   -H "x-access-token: $TOKEN" \
   http://localhost:3333/api/users/me
@@ -25,19 +18,19 @@ curl -s \
 
 Em ferramentas como Postman:
 - Configure uma variável `token` no ambiente com o valor do JWT retornado.
-- Em requisições protegidas, adicione o header `x-access-token: {{token}}` ou `Authorization: Bearer {{token}}`.
+- Em requisições protegidas, adicione sempre o header `x-access-token: {{token}}`.
 
 No frontend:
 - O contexto de autenticação (`frontend/src/contexts/AuthContext.tsx`) guarda `token` após o login.
 - As páginas protegidas (ex.: Perfil, Pedidos) usam `ProtectedRoute` para exigir login.
-- As chamadas a `/api/*` podem enviar automaticamente `Authorization: Bearer <token>` através de interceptors do axios ou manualmente, por exemplo:
+- As chamadas a `/api/*` devem enviar automaticamente `x-access-token` através de interceptors do axios ou manualmente, por exemplo:
 
 ```ts
 import axios from 'axios'
 const api = axios.create({ baseURL: '/api' })
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('uaifood_token')
-  if (token) config.headers['Authorization'] = `Bearer ${token}`
+  if (token) config.headers['x-access-token'] = token
   return config
 })
 ```

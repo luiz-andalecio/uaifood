@@ -2,7 +2,7 @@
 import { Router, type Request, type Response } from 'express'
 import { PrismaClient } from '@prisma/client'
 import bcrypt from 'bcryptjs'
-import { verifyUser, isAdmin, isRoot } from '../middlewares/auth'
+import { verifyUser, isAdmin, isRoot } from '../core/auth'
 import { validateBody } from '../core/validate'
 import { profileUpdateSchema, changePasswordSchema } from '../validation/users.schemas'
 import {

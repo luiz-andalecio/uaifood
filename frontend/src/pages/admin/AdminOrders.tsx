@@ -34,9 +34,9 @@ export default function AdminOrders() {
       const url = new URL('/api/admin/orders', window.location.origin)
       const status = typeof s === 'string' ? s : statusFilter
       if (status) url.searchParams.set('status', status)
-      const res = await fetch(url.toString(), { headers: { Authorization: `Bearer ${token}` } })
-      const data = await res.json()
-      setOrders(data.orders || [])
+      const res = await fetch(url.toString(), { headers: token ? { 'x-access-token': token } : {} })
+      const json = await res.json()
+      setOrders(json?.data?.orders || [])
     } catch (e) {
       toast.error('Falha ao carregar pedidos')
     } finally {
@@ -54,10 +54,11 @@ export default function AdminOrders() {
     try {
       const res = await fetch(`/api/admin/orders/${id}/status`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        headers: token ? { 'Content-Type': 'application/json', 'x-access-token': token } : { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status })
       })
-      if (!res.ok) throw new Error()
+      const json = await res.json()
+      if (!res.ok) throw new Error(json?.message || 'Falha ao atualizar status')
       toast.success('Status atualizado')
       load()
     } catch {
@@ -73,7 +74,7 @@ export default function AdminOrders() {
     try {
       const res = await fetch(`/api/admin/orders/${id}`, {
         method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}` }
+        headers: token ? { 'x-access-token': token } : {}
       })
       if (!res.ok) throw new Error()
       toast.success('Pedido cancelado')

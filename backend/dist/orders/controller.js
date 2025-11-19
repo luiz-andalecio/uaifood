@@ -5,17 +5,21 @@ exports.createOrder = createOrder;
 const responses_1 = require("../core/responses");
 const model_1 = require("./model");
 async function listMyOrders(req, res) {
-    const userId = req.user.id;
+    const userId = req.user?.id;
+    if (!userId)
+        return (0, responses_1.sendError)(res, 'Não autenticado.', 401);
     const orders = await (0, model_1.findOrdersByUser)(userId);
     return (0, responses_1.sendSuccess)(res, { orders });
 }
 async function createOrder(req, res) {
-    const userId = req.user.id;
+    const userId = req.user?.id;
+    if (!userId)
+        return (0, responses_1.sendError)(res, 'Não autenticado.', 401);
     const { tableNumber, paymentMethod, items } = req.body;
     const ids = items.map((i) => i.itemId);
     const dbItems = await (0, model_1.findActiveItemsByIds)(ids);
     if (dbItems.length !== ids.length)
-        return (0, responses_1.sendError)(res, 'Alguns itens sao invalidos ou inativos.', 400);
+        return (0, responses_1.sendError)(res, 'Itens inválidos ou inativos.', 400);
     let subtotal = 0;
     const orderItemsData = items.map((i) => {
         const found = dbItems.find((d) => d.id === i.itemId);

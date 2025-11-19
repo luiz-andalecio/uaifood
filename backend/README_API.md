@@ -1,6 +1,7 @@
 # UAIFood API – Endpoints
 
 > 📖 Veja instruções detalhadas de autenticação em [docs/auth.md](docs/auth.md)
+> 🧭 Visão geral completa (backend/frontend): [docs/overview.md](docs/overview.md)
 
 Documentação OpenAPI (Swagger) modular:
 - Os arquivos da especificação agora estão em `src/swagger/` (com `index.yaml`, `components/` e `paths/`).
@@ -18,8 +19,8 @@ Documentação resumida dos endpoints (detalhes completos e exemplos em `/docs`)
 
 Observações de headers de autenticação:
 - Preferencial: `Authorization: Bearer <token>`
-- Compatível (estilo jwt-example): `x-access-token: <token>`
-  - O backend aceita ambos para facilitar testes via Postman e compatibilidade com exemplos legados.
+- Alternativo: `x-access-token: <token>`
+  - Ambos aceitos para facilitar testes.
 
 ## Menu
 | Método | Rota | Descrição | Auth |
@@ -69,74 +70,16 @@ Authorization: Bearer <JWT>
 ### Notas de implementação
 - Config de ambiente centralizada em `src/config/env.ts` (carrega `.env`, define `PORT` e `JWT_SECRET`).
 - Assinatura/validação de JWT em `src/core/jwt.ts` (payload tipado, expiração padrão 7d).
-- Middlewares enxutos em `src/middlewares/` (`auth.ts` e `error.ts`).
+- Middlewares enxutos em `src/core/` (`auth.ts` e `errorHandler.ts`).
 - Rotas mantidas simples e objetivas, com mensagens de erro claras em português.
 
-### NextSteps:
-Aproxime ainda mais algum ponto do estilo do jwt-example (exemplo: estrutura de pastas, uso de Sequelize, handlers de resposta, etc.)
-Adicionar um logger leve (pino) no errorHandler.
-Padronizar respostas de validação com um helper.
-Adicionar validação de schema (ex.: zod) nas rotas de entrada mais sensíveis sem “pesar” o código.
-Atualizar o Swagger para refletir todos os endpoints de perfil/usuários que já existem (ex.: /users/me/change-password).
-Atualizo a documentação Swagger com os exemplos de payload após normalização de email.
-Adiciono validação leve com zod só nos endpoints de auth (mantendo o resto simples).
-Integro um logger não-verboso no handler de erros.
-
-Aqui estão pontos do jwt-example que podem ser aplicados para deixar o projeto UAIFood ainda mais humano, organizado e didático:
-
-Backend
-Estrutura de Pastas Modular
-
-Separar controllers, models, routes, core, configs (como no jwt-example).
-Exemplo: mover lógica de cada rota para um controller (ex: src/user/controller.ts), deixando as rotas só como “ponte”.
-Controllers e Models
-
-Criar controllers para cada recurso (user, profile, menu, order), facilitando testes e manutenção.
-Models podem ser mantidos no Prisma, mas controllers ajudam a separar regras de negócio.
-Helpers de Resposta
-
-Criar helpers para respostas padronizadas (ex: sendSuccess, sendError), evitando repetição de res.status().json().
-Validação de Dados
-
-Usar uma lib como Zod ou Joi para validar body/query params nas rotas (como o jwt-example faz com schemas).
-Exemplo: validar email/senha antes de criar usuário.
-Logger Simples
-
-Adicionar um logger leve (ex: pino, winston) para registrar erros e ações importantes.
-Configuração Centralizada
-
-Já foi feito com env.ts, mas pode expandir para configs de database, CORS, etc.
-Documentação de Rotas
-
-Adicionar exemplos de uso (payloads) nos arquivos de rota ou controllers, como comentários.
-Testes Automatizados
-
-Adicionar testes de integração para rotas principais usando Jest ou Vitest.
-Padronização de Mensagens
-
-Usar helpers para mensagens de erro e sucesso, mantendo consistência.
-Exemplo de Postman
-
-Gerar uma coleção Postman para facilitar testes manuais (como o exemplo.postman_collection).
-Frontend
-Separação de Contextos e Hooks
-
-Manter contextos (Auth, Cart) em src/contexts/ e criar hooks customizados para lógica de autenticação.
-Componentização
-
-Manter componentes pequenos e reutilizáveis, como no exemplo.
-Validação de Formulários
-
-Usar libs como Zod ou Yup para validar dados do usuário no frontend.
-Padronização de Mensagens
-
-Centralizar mensagens de erro/sucesso em um provider (ex: ToastProvider).
-Exemplo de Consumo de API
-
-Adicionar exemplos de requisições (fetch/axios) em comentários ou docs.
-Documentação de Fluxo
-
-Documentar o fluxo de login, registro e uso do JWT no frontend (como o token é armazenado, renovado, etc).
+### Ideias de evolução
+- Logger estruturado mais detalhado.
+- Testes de integração e cobertura básica.
+- Controllers uniformes para todos os domínios.
+- Cache simples para o menu público.
+- Paginação e filtros mais ricos nas listagens.
+- Regras extras de validação (senha forte, formatos de telefone/endereço).
 
 ## Exemplos Rápidos
 ### Login
@@ -165,4 +108,6 @@ POST /api/orders
 ---
 
 Atualizações recentes:
-- Simplificação e centralização de JWT/ENV conforme boas práticas do exemplo `jwt-example`, mantendo Prisma e Express.
+- Centralização de JWT/ENV.
+- Validações com Zod extraídas para pastas próprias.
+- Padronização de respostas (ok/data/message).

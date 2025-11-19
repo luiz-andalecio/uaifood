@@ -18,6 +18,6 @@ export function updateItem(id: string, data: Partial<{ name: string; price: numb
 }
 
 export function softDeleteItem(id: string) {
-  return prisma.item.update({ where: { id }, data: { is_active: false, deleted_at: new Date() as any } })
+  return prisma.item.update({ where: { id }, data: { is_active: false, deleted_at: new Date() } })
 }
 

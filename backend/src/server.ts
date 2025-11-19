@@ -8,9 +8,10 @@ import swaggerUi from 'swagger-ui-express'
 import fs from 'fs'
 import path from 'path'
 import YAML from 'yaml'
+import type { OpenAPIV3 } from 'openapi-types'
 
 import { router as apiRouter } from './routes/index'
-import { errorHandler } from './middlewares/errorHandler'
+import { errorHandler } from './core/errorHandler'
 import logger from './core/logger'
 
 const app = express()
@@ -22,7 +23,7 @@ app.use(express.json()) // payload JSON
 app.use(morgan('dev')) // logs de requisicoes
 
 // documentação Swagger (OpenAPI) carregada via YAML (suporta arquivo único ou pasta com múltiplos arquivos e $ref)
-let swaggerDocument: any | null = null
+let swaggerDocument: OpenAPIV3.Document | null = null
 try {
   // Primeiro tenta o modelo multi-arquivos: backend/src/swagger/index.yaml (ou caminhos equivalentes)
   const folderCandidates = [

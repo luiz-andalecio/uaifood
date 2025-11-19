@@ -43,27 +43,28 @@ exports.adminListUsers = adminListUsers;
 exports.adminSetRole = adminSetRole;
 exports.adminResetPassword = adminResetPassword;
 exports.adminDeleteUser = adminDeleteUser;
-// controller de usuarios: regras de negocio e orquestracao
+// controller de usuários: regras simples
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const responses_1 = require("../core/responses");
 const model_1 = require("./model");
 async function getMe(req, res) {
-    const userId = req.user.id;
+    const userId = req.user?.id;
+    if (!userId)
+        return (0, responses_1.sendError)(res, 'Não autenticado.', 401);
     const user = await (0, model_1.findUserById)(userId);
     if (!user)
         return (0, responses_1.sendError)(res, 'Usuário não encontrado.', 404);
-    const u = user;
-    return (0, responses_1.sendSuccess)(res, { id: user.id, name: user.name, email: user.email, phone: user.phone, role: user.role, address: u.address ?? null, zip_code: u.zip_code ?? null });
+    return (0, responses_1.sendSuccess)(res, { id: user.id, name: user.name, email: user.email, phone: user.phone ?? null, role: user.role, address: user.address ?? null, zip_code: user.zip_code ?? null });
 }
 async function updateMe(req, res) {
-    const userId = req.user.id;
+    const userId = req.user?.id;
+    if (!userId)
+        return (0, responses_1.sendError)(res, 'Não autenticado.', 401);
     const { name, email, phone, address, zip_code, password } = req.body;
     if (!name && !email && !phone && !address && !zip_code)
-        return (0, responses_1.sendError)(res, 'Nada para atualizar.', 400);
-    // confirma senha antes de alterar
+        return (0, responses_1.sendError)(res, 'Nenhum campo informado.', 400);
     if (!password)
         return (0, responses_1.sendError)(res, 'Confirme sua senha para salvar as alterações.', 400);
-    // verifica senha
     const current = await (0, model_1.findUserById)(userId);
     if (!current)
         return (0, responses_1.sendError)(res, 'Usuário não encontrado.', 404);
@@ -72,8 +73,14 @@ async function updateMe(req, res) {
         return (0, responses_1.sendError)(res, 'Senha atual inválida.', 401);
     try {
         const updated = await (0, model_1.updateUser)(userId, { name, email, phone, address, zip_code });
-        const u = updated;
-        return (0, responses_1.sendSuccess)(res, { id: updated.id, name: updated.name, email: updated.email, phone: updated.phone, address: u.address ?? null, zip_code: u.zip_code ?? null });
+        return (0, responses_1.sendSuccess)(res, {
+            id: updated.id,
+            name: updated.name,
+            email: updated.email,
+            phone: updated.phone ?? null,
+            address: updated.address ?? null,
+            zip_code: updated.zip_code ?? null,
+        });
     }
     catch (e) {
         if (e.code === 'P2002')
@@ -82,7 +89,9 @@ async function updateMe(req, res) {
     }
 }
 async function changeMyPassword(req, res) {
-    const userId = req.user.id;
+    const userId = req.user?.id;
+    if (!userId)
+        return (0, responses_1.sendError)(res, 'Não autenticado.', 401);
     const { currentPassword, newPassword } = req.body;
     const user = await (0, model_1.findUserById)(userId);
     if (!user)
@@ -91,16 +100,13 @@ async function changeMyPassword(req, res) {
     if (!ok)
         return (0, responses_1.sendError)(res, 'Senha atual inválida.', 401);
     const password_hash = await bcryptjs_1.default.hash(newPassword, 10);
-    await (0, model_1.updateUser)(userId, {}); // placeholder para manter assinatura consistente
-    // atualiza via prisma diretamente (evitando alterar model generico)
-    // ideal seria ter um metodo especifico no model, mantido simples aqui:
     const { prisma } = await Promise.resolve().then(() => __importStar(require('../core/prisma')));
     await prisma.user.update({ where: { id: userId }, data: { password_hash } });
     return (0, responses_1.sendSuccess)(res, { message: 'Senha alterada com sucesso.' });
 }
 async function adminListUsers(req, res) {
-    const page = Math.max(parseInt(String(req.query.page ?? '1')), 1);
-    const pageSize = Math.max(Math.min(parseInt(String(req.query.pageSize ?? '20')), 100), 1);
+    const page = Math.max(Number(req.query.page ?? 1), 1);
+    const pageSize = Math.max(Math.min(Number(req.query.pageSize ?? 20), 100), 1);
     const [total, users] = await Promise.all([(0, model_1.countUsers)(true), (0, model_1.listUsers)(true, page, pageSize)]);
     return (0, responses_1.sendSuccess)(res, { total, page, pageSize, users });
 }
@@ -109,7 +115,9 @@ async function adminSetRole(req, res) {
     const { role } = req.body;
     if (!role || !['CLIENTE', 'ADMIN', 'ROOT'].includes(role))
         return (0, responses_1.sendError)(res, 'Role inválida.', 400);
-    const meId = req.user.id;
+    const meId = req.user?.id;
+    if (!meId)
+        return (0, responses_1.sendError)(res, 'Não autenticado.', 401);
     if (id === meId)
         return (0, responses_1.sendError)(res, 'Não é permitido alterar o próprio papel.', 400);
     const updated = await (0, model_1.updateUserRole)(id, role);
@@ -119,7 +127,7 @@ async function adminResetPassword(req, res) {
     const { id } = req.params;
     const { password } = req.body;
     if (!password || password.length < 8)
-        return (0, responses_1.sendError)(res, 'Senha deve ter no mínimo 8 caracteres.', 400);
+        return (0, responses_1.sendError)(res, 'Senha mínima 8 caracteres.', 400);
     const { prisma } = await Promise.resolve().then(() => __importStar(require('../core/prisma')));
     const password_hash = await bcryptjs_1.default.hash(password, 10);
     await prisma.user.update({ where: { id }, data: { password_hash } });
@@ -127,7 +135,9 @@ async function adminResetPassword(req, res) {
 }
 async function adminDeleteUser(req, res) {
     const { id } = req.params;
-    const meId = req.user.id;
+    const meId = req.user?.id;
+    if (!meId)
+        return (0, responses_1.sendError)(res, 'Não autenticado.', 401);
     if (id === meId)
         return (0, responses_1.sendError)(res, 'Não é permitido desativar a si mesmo.', 400);
     const user = await (0, model_1.findUserById)(id);

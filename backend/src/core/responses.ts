@@ -10,8 +10,8 @@ export function sendMessage(res: Response, message: string, status = 200) {
 }
 
 export function sendError(res: Response, message: string, status = 400, details?: unknown) {
-  const body: any = { ok: false, message }
-  if (details) body.details = details
+  const body: { ok: false; message: string; details?: unknown } = { ok: false, message }
+  if (details !== undefined) body.details = details
   return res.status(status).json(body)
 }
 

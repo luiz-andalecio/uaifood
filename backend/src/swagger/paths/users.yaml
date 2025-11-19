@@ -3,7 +3,6 @@ usersMe:
     tags: [Users]
     summary: Dados do usuário autenticado
     security:
-      - bearerAuth: []
       - xAccessToken: []
     responses:
       '200':
@@ -24,7 +23,6 @@ usersMe:
     tags: [Users]
     summary: Atualiza dados básicos (confirma senha)
     security:
-      - bearerAuth: []
       - xAccessToken: []
     requestBody:
       required: true
@@ -50,7 +48,6 @@ usersChangePassword:
     tags: [Users]
     summary: Troca a própria senha
     security:
-      - bearerAuth: []
       - xAccessToken: []
     requestBody:
       required: true
@@ -74,7 +71,6 @@ usersList:
     tags: [Users]
     summary: Lista usuários (ADMIN/ROOT)
     security:
-      - bearerAuth: []
       - xAccessToken: []
     parameters:
       - in: query
@@ -92,7 +88,6 @@ usersSetRole:
     tags: [Users]
     summary: Altera role (ROOT)
     security:
-      - bearerAuth: []
       - xAccessToken: []
     parameters:
       - name: id
@@ -120,7 +115,6 @@ usersResetPassword:
     tags: [Users]
     summary: Redefine senha de usuário (ADMIN/ROOT)
     security:
-      - bearerAuth: []
       - xAccessToken: []
     parameters:
       - name: id
@@ -148,7 +142,6 @@ usersDelete:
     tags: [Users]
     summary: Desativa usuário (ADMIN/ROOT)
     security:
-      - bearerAuth: []
       - xAccessToken: []
     parameters:
       - name: id

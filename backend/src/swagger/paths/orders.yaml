@@ -3,7 +3,6 @@ orders:
     tags: [Orders]
     summary: Lista pedidos do usuário autenticado
     security:
-      - bearerAuth: []
       - xAccessToken: []
     responses:
       '200':
@@ -40,7 +39,6 @@ orders:
     tags: [Orders]
     summary: Cria pedido (mesa obrigatória)
     security:
-      - bearerAuth: []
       - xAccessToken: []
     requestBody:
       required: true

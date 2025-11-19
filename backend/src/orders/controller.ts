@@ -5,22 +5,20 @@ import { sendError, sendSuccess } from '../core/responses'
 import { findActiveItemsByIds, findOrdersByUser, createOrderWithItems } from './model'
 
 export async function listMyOrders(req: Request, res: Response) {
-  const userId = (req as any).user.id as string
+  const userId = req.user?.id
+  if (!userId) return sendError(res, 'Não autenticado.', 401)
   const orders = await findOrdersByUser(userId)
   return sendSuccess(res, { orders })
 }
 
 export async function createOrder(req: Request, res: Response) {
-  const userId = (req as any).user.id as string
-  const { tableNumber, paymentMethod, items } = req.body as {
-    tableNumber: string
-    paymentMethod: keyof typeof PaymentMethod
-    items: Array<{ itemId: string; quantity: number }>
-  }
+  const userId = req.user?.id
+  if (!userId) return sendError(res, 'Não autenticado.', 401)
+  const { tableNumber, paymentMethod, items } = req.body as { tableNumber: string; paymentMethod: keyof typeof PaymentMethod; items: Array<{ itemId: string; quantity: number }> }
 
   const ids = items.map((i) => i.itemId)
   const dbItems = await findActiveItemsByIds(ids)
-  if (dbItems.length !== ids.length) return sendError(res, 'Alguns itens sao invalidos ou inativos.', 400)
+  if (dbItems.length !== ids.length) return sendError(res, 'Itens inválidos ou inativos.', 400)
 
   let subtotal = 0
   const orderItemsData = items.map((i) => {

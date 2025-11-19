@@ -6,7 +6,7 @@ export function findOrdersByUser(userId: string) {
   return prisma.order.findMany({
     where: { user_id: userId },
     orderBy: { created_at: 'desc' },
-    include: { items: { include: { item: true } } as any },
+    include: { items: { include: { item: true } } },
   })
 }
 

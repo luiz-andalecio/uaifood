@@ -3,30 +3,20 @@ info:
   title: UAIFood API
   version: 1.0.0
   description: |
-    API do UAIFood (YAML). Segurança JWT via Bearer JWT.
-    Também é aceito o cabeçalho `x-access-token` como alternativa (estilo jwt-example).
+    API do UAIFood. Autenticação via JWT fornecido exclusivamente pelo header `x-access-token`.
 
     ## Autenticação
-    Esta API exige autenticação para a maioria dos endpoints. Você pode enviar o token JWT de duas formas:
+    Para obter o token: faça login em `/api/auth/login` e use o valor retornado em todas as rotas protegidas.
 
-    1) Header Authorization (preferencial)
-
-    ```bash
-    curl -H "Authorization: Bearer <seu_token>" http://localhost:3333/api/users/me
-    ```
-
-    2) Header x-access-token (compatibilidade com jwt-example)
+    Exemplo:
 
     ```bash
     curl -H "x-access-token: <seu_token>" http://localhost:3333/api/users/me
     ```
-
-    Para obter o token, faça login em `/api/auth/login`.
 servers:
   - url: http://localhost:3333
     description: Desenvolvimento local
 security:
-  - bearerAuth: []
   - xAccessToken: []
 tags:
   - name: Health

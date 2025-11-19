@@ -33,5 +33,5 @@ export function updateUserRole(id: string, role: 'CLIENTE' | 'ADMIN' | 'ROOT') {
 }
 
 export function softDeleteUser(id: string) {
-  return prisma.user.update({ where: { id }, data: { is_active: false, deleted_at: new Date() as any } })
+  return prisma.user.update({ where: { id }, data: { is_active: false, deleted_at: new Date() } })
 }

@@ -1,6 +1,6 @@
 import { Router, type Request, type Response } from 'express'
 import { PrismaClient } from '@prisma/client'
-import { verifyUser, isAdmin } from '../middlewares/auth'
+import { verifyUser, isAdmin } from '../core/auth'
 
 const prisma = new PrismaClient()
 export const router = Router()

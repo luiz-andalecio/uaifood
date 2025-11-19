@@ -27,7 +27,7 @@ export default function Menu() {
   useEffect(() => {
     fetch('/api/menu')
       .then((r) => r.json())
-      .then((data) => setCategories(data.categories || []))
+      .then((json) => setCategories(json?.data?.categories || []))
       .catch(() => setCategories([]))
   }, [])
 
@@ -58,7 +58,7 @@ export default function Menu() {
     try {
       const res = await fetch('/api/orders', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        headers: { 'Content-Type': 'application/json', 'x-access-token': token },
         body: JSON.stringify({
           tableNumber: tableNumber || null,
           paymentMethod,

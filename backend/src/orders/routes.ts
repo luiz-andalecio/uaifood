@@ -1,7 +1,7 @@
 // rotas de pedidos: criar e listar pedidos do usuario autenticado
 import { Router, type Request, type Response } from 'express'
 import { PrismaClient, PaymentMethod, OrderStatus } from '@prisma/client'
-import { verifyUser } from '../middlewares/auth'
+import { verifyUser } from '../core/auth'
 import { validateBody } from '../core/validate'
 import { sendError, sendSuccess } from '../core/responses'
 import { listMyOrders, createOrder as createOrderController } from './controller'

@@ -31,7 +31,7 @@ export default function CartPage() {
     try {
       const res = await fetch('/api/orders', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        headers: { 'Content-Type': 'application/json', 'x-access-token': token },
         body: JSON.stringify({
           tableNumber: tableNumber || null,
           paymentMethod,

@@ -12,7 +12,7 @@ function sendMessage(res, message, status = 200) {
 }
 function sendError(res, message, status = 400, details) {
     const body = { ok: false, message };
-    if (details)
+    if (details !== undefined)
         body.details = details;
     return res.status(status).json(body);
 }

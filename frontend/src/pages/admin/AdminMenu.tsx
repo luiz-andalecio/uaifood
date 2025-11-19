@@ -24,9 +24,10 @@ export default function AdminMenu() {
     async function load() {
       // reusa GET /api/menu para categorias e itens
       const res = await fetch('/api/menu')
-      const data = await res.json()
-      const cats: Category[] = (data.categories || []).map((c: any) => ({ id: c.id, name: c.name }))
-      const flat: Item[] = (data.categories || []).flatMap((c: any) => c.items || [])
+      const json = await res.json()
+      const catsRaw = json?.data?.categories || []
+      const cats: Category[] = catsRaw.map((c: any) => ({ id: c.id, name: c.name }))
+      const flat: Item[] = catsRaw.flatMap((c: any) => c.items || [])
       setCategories(cats)
       setItems(flat)
       setLoading(false)
@@ -42,13 +43,13 @@ export default function AdminMenu() {
     try {
       const res = await fetch('/api/menu/items', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        headers: { 'Content-Type': 'application/json', 'x-access-token': token },
         body: JSON.stringify({ name: form.name, price: Number(form.price), categoryId: form.categoryId || undefined })
       })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data?.message || 'Falha ao criar')
-      // recarrega lista simples
-      setItems((prev) => [...prev, data])
+      const json = await res.json()
+      if (!res.ok) throw new Error(json?.message || 'Falha ao criar')
+      const created = json?.data
+      if (created) setItems((prev) => [...prev, created])
       setForm({ name: '', price: '', categoryId: '' })
       toast.success('Item criado')
     } catch (e: any) {
@@ -68,12 +69,13 @@ export default function AdminMenu() {
     try {
       const res = await fetch(`/api/menu/items/${id}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        headers: { 'Content-Type': 'application/json', 'x-access-token': token },
         body: JSON.stringify({ name: editForm.name, price: Number(editForm.price) })
       })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data?.message || 'Falha ao editar')
-      setItems((prev) => prev.map((p) => (p.id === id ? { ...p, name: data.name, price: data.price } : p)))
+      const json = await res.json()
+      if (!res.ok) throw new Error(json?.message || 'Falha ao editar')
+      const updated = json?.data
+      if (updated) setItems((prev) => prev.map((p) => (p.id === id ? { ...p, name: updated.name, price: updated.price } : p)))
       setEditingId(null)
       toast.success('Item atualizado')
     } catch (e: any) {
@@ -86,11 +88,11 @@ export default function AdminMenu() {
     try {
       const res = await fetch(`/api/menu/items/${id}`, {
         method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { 'x-access-token': token }
       })
       if (!res.ok && res.status !== 204) {
-        const data = await res.json().catch(() => ({}))
-        throw new Error(data?.message || 'Falha ao excluir')
+        const json = await res.json().catch(() => ({}))
+        throw new Error(json?.message || 'Falha ao excluir')
       }
       setItems((prev) => prev.filter((p) => p.id !== id))
       toast.success('Item excluído')

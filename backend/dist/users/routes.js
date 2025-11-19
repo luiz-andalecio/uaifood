@@ -8,17 +8,21 @@ exports.router = void 0;
 const express_1 = require("express");
 const client_1 = require("@prisma/client");
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
-const auth_1 = require("../middlewares/auth");
+const auth_1 = require("../core/auth");
 const prisma = new client_1.PrismaClient();
 exports.router = (0, express_1.Router)();
 // GET /api/users/me - retorna dados do usue1rio autenticado
-exports.router.get('/me', auth_1.verifyToken, async (req, res) => {
-    const id = req.user.id;
+exports.router.get('/me', auth_1.verifyUser, async (req, res) => {
+    const id = req.user?.id;
+    if (!id)
+        return res.status(401).json({ message: 'Não autenticado.' });
     const user = await prisma.user.findUnique({ where: { id } });
-    return res.json({ id: user?.id, name: user?.name, email: user?.email, role: user?.role });
+    if (!user)
+        return res.status(404).json({ message: 'Usuário não encontrado.' });
+    return res.json({ id: user.id, name: user.name, email: user.email, role: user.role });
 });
 // GET /api/users - admin lista usue1rios com paginae7e3o simples
-exports.router.get('/', auth_1.verifyToken, auth_1.isAdmin, async (req, res) => {
+exports.router.get('/', auth_1.verifyUser, auth_1.isAdmin, async (req, res) => {
     const page = Number(req.query.page || 1);
     const pageSize = Math.min(Number(req.query.pageSize || 10), 50);
     const skip = (page - 1) * pageSize;
@@ -30,7 +34,7 @@ exports.router.get('/', auth_1.verifyToken, auth_1.isAdmin, async (req, res) => 
     return res.json({ page, pageSize, total, users });
 });
 // PATCH /api/users/:id/role - root altera role de qualquer um
-exports.router.patch('/:id/role', auth_1.verifyToken, auth_1.isRoot, async (req, res) => {
+exports.router.patch('/:id/role', auth_1.verifyUser, auth_1.isRoot, async (req, res) => {
     const { id } = req.params;
     const { role } = req.body;
     if (!['CLIENTE', 'ADMIN', 'ROOT'].includes(role))
@@ -48,7 +52,7 @@ exports.router.patch('/:id/role', auth_1.verifyToken, auth_1.isRoot, async (req,
     return res.json({ id: updated.id, role: updated.role });
 });
 // PATCH /api/users/:id/password - ROOT redefine a senha de qualquer usuário
-exports.router.patch('/:id/password', auth_1.verifyToken, auth_1.isRoot, async (req, res) => {
+exports.router.patch('/:id/password', auth_1.verifyUser, auth_1.isRoot, async (req, res) => {
     try {
         const { id } = req.params;
         const { password } = req.body;
@@ -65,12 +69,12 @@ exports.router.patch('/:id/password', auth_1.verifyToken, auth_1.isRoot, async (
         await prisma.user.update({ where: { id }, data: { password_hash } });
         return res.json({ id, message: 'Senha atualizada com sucesso.' });
     }
-    catch (e) {
+    catch (_e) {
         return res.status(500).json({ message: 'Erro ao atualizar senha.' });
     }
 });
 // DELETE /api/users/:id - ROOT pode desativar/excluir conta (soft delete)
-exports.router.delete('/:id', auth_1.verifyToken, auth_1.isRoot, async (req, res) => {
+exports.router.delete('/:id', auth_1.verifyUser, auth_1.isRoot, async (req, res) => {
     try {
         const { id } = req.params;
         const target = await prisma.user.findUnique({ where: { id } });
@@ -88,7 +92,7 @@ exports.router.delete('/:id', auth_1.verifyToken, auth_1.isRoot, async (req, res
         });
         return res.json({ id: deleted.id, message: 'Usuário desativado.' });
     }
-    catch (e) {
+    catch (_e) {
         return res.status(500).json({ message: 'Erro ao excluir usuário.' });
     }
 });

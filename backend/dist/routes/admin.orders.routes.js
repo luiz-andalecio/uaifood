@@ -4,18 +4,18 @@ exports.router = void 0;
 // rotas administrativas de pedidos: listar, atualizar status e cancelar
 const express_1 = require("express");
 const client_1 = require("@prisma/client");
-const auth_1 = require("../middlewares/auth");
+const auth_1 = require("../core/auth");
 const validate_1 = require("../core/validate");
 const admin_schemas_1 = require("../validation/admin.schemas");
 const responses_1 = require("../core/responses");
 const prisma = new client_1.PrismaClient();
 exports.router = (0, express_1.Router)();
 // GET /api/admin/orders - lista pedidos com usuario e itens
-exports.router.get('/', auth_1.verifyToken, auth_1.isAdmin, async (req, res) => {
+exports.router.get('/', auth_1.verifyUser, auth_1.isAdmin, async (req, res) => {
     const { status } = req.query;
     const where = {};
     if (status)
-        where.status = status; // sera validado pelo banco quando enum existir
+        where.status = status;
     const orders = await prisma.order.findMany({
         where,
         orderBy: { created_at: 'desc' },
@@ -27,11 +27,11 @@ exports.router.get('/', auth_1.verifyToken, auth_1.isAdmin, async (req, res) => 
     res.json({ orders });
 });
 // PATCH /api/admin/orders/:id/status - atualiza status do pedido
-exports.router.patch('/:id/status', auth_1.verifyToken, auth_1.isAdmin, (0, validate_1.validateBody)(admin_schemas_1.setStatusSchema), async (req, res) => {
+exports.router.patch('/:id/status', auth_1.verifyUser, auth_1.isAdmin, (0, validate_1.validateBody)(admin_schemas_1.setStatusSchema), async (req, res) => {
     const { id } = req.params;
     const { status } = req.body;
     try {
-        const updated = await prisma.order.update({ where: { id }, data: { status: status } });
+        const updated = await prisma.order.update({ where: { id }, data: { status } });
         return (0, responses_1.sendSuccess)(res, { id: updated.id, status: updated.status });
     }
     catch (e) {
@@ -39,7 +39,7 @@ exports.router.patch('/:id/status', auth_1.verifyToken, auth_1.isAdmin, (0, vali
     }
 });
 // DELETE /api/admin/orders/:id - cancela um pedido
-exports.router.delete('/:id', auth_1.verifyToken, auth_1.isAdmin, async (req, res) => {
+exports.router.delete('/:id', auth_1.verifyUser, auth_1.isAdmin, async (req, res) => {
     const { id } = req.params;
     try {
         const updated = await prisma.order.update({

@@ -11,16 +11,16 @@ Este guia explica o que é Swagger/OpenAPI, para que serve, como está configura
 - **Versão**: OpenAPI `3.0.3`.
 - **UI**: Servida pelo backend em `http://localhost:3333/docs`.
 - **Especificação multi-arquivos** (modular):
-  - Raiz da especificação: `backend/src/swagger/index.yaml`.
-  - Componentes e paths separados em arquivos, para manutenção fácil.
-  - A UI carrega a especificação a partir de `/docs-spec/index.yaml` (servida estaticamente).
-  - Endpoint auxiliar: `/docs.json` expõe a especificação principal para inspeção rápida.
+  - Arquivo raiz: `backend/src/swagger/index.yaml`.
+  - Componentes e paths em subpastas para ficar simples de manter.
+  - A UI consome `/docs-spec/index.yaml` diretamente.
+  - `/docs.json` devolve o documento raiz sem resolver as refs.
 - **Estrutura**:
   ```
   backend/src/swagger/
     index.yaml                 # OpenAPI raiz
     components/
-      security.yaml            # Esquemas de segurança (bearerAuth, xAccessToken)
+      security.yaml            # Esquema de segurança (xAccessToken)
       schemas.yaml             # Schemas (User, Item, Order, Error, etc.)
       responses.yaml           # Respostas comuns (Unauthorized, Forbidden, ...)
     paths/
@@ -31,15 +31,12 @@ Este guia explica o que é Swagger/OpenAPI, para que serve, como está configura
       orders.yaml
       admin.yaml
   ```
-- **Segurança Global**: definida em `index.yaml` com `bearerAuth` e `xAccessToken`. Isso significa que, por padrão, os endpoints exigem autenticação, a menos que o próprio path defina `security: []` (por exemplo, `/health`, `/api/auth/*`, `/api/menu`).
+- **Segurança Global**: definida em `index.yaml` com `xAccessToken`. Por padrão, os endpoints exigem autenticação, a menos que o path defina `security: []` (ex.: `/health`, `/api/auth/*`, `/api/menu`).
 
 ## Autenticação e Segurança
-- O backend aceita dois formatos de header:
-  - Preferencial: `Authorization: Bearer <seu_token>`
-  - Compatível (jwt-example): `x-access-token: <seu_token>`
-- No Swagger UI, use o botão “Authorize” para informar o token uma única vez.
-  - Em `bearerAuth`, informe apenas o token (a UI adiciona o prefixo `Bearer`).
-  - O suporte a `xAccessToken` também está disponível, se desejar testar por esse cabeçalho.
+- O backend aceita apenas um header de autenticação:
+  - `x-access-token: <seu_token>`
+- No Swagger UI, use o botão “Authorize” para informar o token uma única vez (campo `xAccessToken`).
 - Perfis de acesso:
   - Endpoints administrativos exigem `ADMIN` ou `ROOT` (ex.: `/api/admin/*`).
   - Sem o perfil, o backend retorna `403 Forbidden`.
@@ -53,7 +50,7 @@ Este guia explica o que é Swagger/OpenAPI, para que serve, como está configura
    ```
 2. Abra a UI: `http://localhost:3333/docs`
 3. Faça login em `/api/auth/login` (via Swagger, Postman ou curl) e copie o `token` retornado.
-4. Clique em “Authorize” e cole o token no campo `bearerAuth`.
+4. Clique em “Authorize” e informe o token em `xAccessToken`.
 5. Use “Try it out” nos endpoints protegidos (ex.: `/api/users/me`).
 
 ## Fluxo rápido de teste pelo Swagger UI
@@ -63,7 +60,7 @@ Este guia explica o que é Swagger/OpenAPI, para que serve, como está configura
    { "email": "root@uaifood.com", "password": "root" }
    ```
 3. Copie o `token` do `LoginResponse`.
-4. Clique em “Authorize” e informe o token em `bearerAuth`.
+4. Clique em “Authorize” e informe o token em `xAccessToken`.
 5. Teste endpoints protegidos:
    - `GET /api/users/me` (perfil do usuário logado)
    - `GET /api/orders` (pedidos do próprio usuário)
@@ -74,19 +71,14 @@ Este guia explica o que é Swagger/OpenAPI, para que serve, como está configura
   ```bash
   TOKEN="<cole_seu_token_aqui>"
   ```
-- Usando `Authorization: Bearer`:
-  ```bash
-  curl -sS -H "Authorization: Bearer $TOKEN" \
-    http://localhost:3333/api/users/me | jq
-  ```
-- Usando `x-access-token` (compatibilidade):
+- Usando `x-access-token`:
   ```bash
   curl -sS -H "x-access-token: $TOKEN" \
     http://localhost:3333/api/users/me | jq
   ```
 - Admin (exemplo – listagem de pedidos):
   ```bash
-  curl -sS -H "Authorization: Bearer $TOKEN" \
+  curl -sS -H "x-access-token: $TOKEN" \
     "http://localhost:3333/api/admin/orders?status=PREPARANDO" | jq
   ```
 

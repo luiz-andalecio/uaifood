@@ -29,9 +29,9 @@ export default function MyOrders() {
     async function load() {
       if (!token) return
       try {
-        const res = await fetch('/api/orders', { headers: { Authorization: `Bearer ${token}` } })
-        const data = await res.json()
-        if (res.ok && mounted) setOrders(data.orders || [])
+        const res = await fetch('/api/orders', { headers: { 'x-access-token': token } })
+        const json = await res.json()
+        if (res.ok && mounted) setOrders(json?.data?.orders || [])
       } finally {
         if (mounted) setLoading(false)
       }

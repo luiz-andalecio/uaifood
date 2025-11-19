@@ -19,10 +19,10 @@ export default function AdminUsers() {
   useEffect(() => {
     async function load() {
       const res = await fetch('/api/users?page=1&pageSize=50', {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: token ? { 'x-access-token': token } : {}
       })
-      const data = await res.json()
-      setUsers(data.users || [])
+      const json = await res.json()
+      setUsers(json?.data?.users || [])
       setLoading(false)
     }
     if (token) load()
@@ -33,12 +33,13 @@ export default function AdminUsers() {
     try {
       const res = await fetch(`/api/users/${id}/role`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        headers: token ? { 'Content-Type': 'application/json', 'x-access-token': token } : { 'Content-Type': 'application/json' },
         body: JSON.stringify({ role })
       })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data?.message || 'Falha ao alterar role')
-      setUsers((prev) => prev.map((u) => (u.id === id ? { ...u, role: data.role } : u)))
+      const json = await res.json()
+      if (!res.ok) throw new Error(json?.message || 'Falha ao alterar role')
+      const updated = json?.data
+      if (updated) setUsers((prev) => prev.map((u) => (u.id === id ? { ...u, role: updated.role } : u)))
       toast.success('Tipo alterado')
     } catch (e: any) {
       toast.error(e.message || 'Erro ao alterar role')
@@ -51,11 +52,11 @@ export default function AdminUsers() {
     try {
       const res = await fetch(`/api/users/${id}/password`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        headers: token ? { 'Content-Type': 'application/json', 'x-access-token': token } : { 'Content-Type': 'application/json' },
         body: JSON.stringify({ password })
       })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data?.message || 'Falha ao redefinir senha')
+      const json = await res.json()
+      if (!res.ok) throw new Error(json?.message || 'Falha ao redefinir senha')
       toast.success('Senha atualizada com sucesso')
     } catch (e: any) {
       toast.error(e.message || 'Erro ao redefinir senha')
@@ -67,10 +68,10 @@ export default function AdminUsers() {
     try {
       const res = await fetch(`/api/users/${id}`, {
         method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}` }
+        headers: token ? { 'x-access-token': token } : {}
       })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data?.message || 'Falha ao excluir')
+      const json = await res.json()
+      if (!res.ok) throw new Error(json?.message || 'Falha ao excluir')
       setUsers((prev) => prev.filter((u) => u.id !== id))
       toast.success('Usuário excluído (desativado)')
     } catch (e: any) {

@@ -2,20 +2,22 @@
 import { Router, type Request, type Response } from 'express'
 import { PrismaClient } from '@prisma/client'
 import bcrypt from 'bcryptjs'
-import { verifyToken, isAdmin, isRoot } from '../middlewares/auth'
+import { verifyUser, isAdmin, isRoot } from '../core/auth'
 
 const prisma = new PrismaClient()
 export const router = Router()
 
 // GET /api/users/me - retorna dados do usue1rio autenticado
-router.get('/me', verifyToken, async (req: Request, res: Response) => {
-  const id = (req as any).user.id as string
+router.get('/me', verifyUser, async (req: Request, res: Response) => {
+  const id = req.user?.id
+  if (!id) return res.status(401).json({ message: 'Não autenticado.' })
   const user = await prisma.user.findUnique({ where: { id } })
-  return res.json({ id: user?.id, name: user?.name, email: user?.email, role: user?.role })
+  if (!user) return res.status(404).json({ message: 'Usuário não encontrado.' })
+  return res.json({ id: user.id, name: user.name, email: user.email, role: user.role })
 })
 
 // GET /api/users - admin lista usue1rios com paginae7e3o simples
-router.get('/', verifyToken, isAdmin, async (req: Request, res: Response) => {
+router.get('/', verifyUser, isAdmin, async (req: Request, res: Response) => {
   const page = Number(req.query.page || 1)
   const pageSize = Math.min(Number(req.query.pageSize || 10), 50)
   const skip = (page - 1) * pageSize
@@ -30,7 +32,7 @@ router.get('/', verifyToken, isAdmin, async (req: Request, res: Response) => {
 })
 
 // PATCH /api/users/:id/role - root altera role de qualquer um
-router.patch('/:id/role', verifyToken, isRoot, async (req: Request, res: Response) => {
+router.patch('/:id/role', verifyUser, isRoot, async (req: Request, res: Response) => {
   const { id } = req.params
   const { role } = req.body
   if (!['CLIENTE', 'ADMIN', 'ROOT'].includes(role)) return res.status(400).json({ message: 'Role inve1lida.' })
@@ -49,7 +51,7 @@ router.patch('/:id/role', verifyToken, isRoot, async (req: Request, res: Respons
 })
 
 // PATCH /api/users/:id/password - ROOT redefine a senha de qualquer usuário
-router.patch('/:id/password', verifyToken, isRoot, async (req: Request, res: Response) => {
+router.patch('/:id/password', verifyUser, isRoot, async (req: Request, res: Response) => {
   try {
     const { id } = req.params
     const { password } = req.body as { password?: string }
@@ -67,13 +69,13 @@ router.patch('/:id/password', verifyToken, isRoot, async (req: Request, res: Res
     const password_hash = await bcrypt.hash(password, 10)
     await prisma.user.update({ where: { id }, data: { password_hash } })
     return res.json({ id, message: 'Senha atualizada com sucesso.' })
-  } catch (e: any) {
+  } catch (_e) {
     return res.status(500).json({ message: 'Erro ao atualizar senha.' })
   }
 })
 
 // DELETE /api/users/:id - ROOT pode desativar/excluir conta (soft delete)
-router.delete('/:id', verifyToken, isRoot, async (req: Request, res: Response) => {
+router.delete('/:id', verifyUser, isRoot, async (req: Request, res: Response) => {
   try {
     const { id } = req.params
 
@@ -91,7 +93,7 @@ router.delete('/:id', verifyToken, isRoot, async (req: Request, res: Response) =
       data: { is_active: false, deleted_at: new Date() }
     })
     return res.json({ id: deleted.id, message: 'Usuário desativado.' })
-  } catch (e: any) {
+  } catch (_e) {
     return res.status(500).json({ message: 'Erro ao excluir usuário.' })
   }
 })

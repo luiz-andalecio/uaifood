@@ -29,14 +29,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     async function bootstrap() {
       try {
         if (token) {
-          const res = await fetch('/api/users/me', {
-            headers: { Authorization: `Bearer ${token}` }
-          })
+          const res = await fetch('/api/users/me', { headers: { 'x-access-token': token } })
           if (res.ok) {
-            const data = await res.json()
-            setUser(data)
+            const json = await res.json()
+            setUser(json?.data || null)
           } else {
-            // token invalido, remove
             localStorage.removeItem('token')
             setToken(null)
             setUser(null)
@@ -53,10 +50,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   async function refreshMe() {
     if (!token) return
-    const res = await fetch('/api/users/me', { headers: { Authorization: `Bearer ${token}` } })
+    const res = await fetch('/api/users/me', { headers: { 'x-access-token': token } })
     if (res.ok) {
-      const me = await res.json()
-      setUser(me)
+      const meJson = await res.json()
+      setUser(meJson?.data || null)
     }
   }
 
@@ -68,20 +65,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
       })
-      const data = await res.json()
+      const json = await res.json()
       if (!res.ok) return false
-
-      const receivedToken: string | undefined = data?.token
+      const receivedToken: string | undefined = json?.data?.token
+      const receivedUser: User | undefined = json?.data?.user
       if (!receivedToken) return false
 
       localStorage.setItem('token', receivedToken)
       setToken(receivedToken)
 
       // tenta obter dados do usuario logado
-      const me = await fetch('/api/users/me', {
-        headers: { Authorization: `Bearer ${receivedToken}` }
-      })
-      if (me.ok) setUser(await me.json()); else setUser(null)
+      if (receivedUser) {
+        setUser(receivedUser)
+      } else {
+        const me = await fetch('/api/users/me', { headers: { 'x-access-token': receivedToken } })
+        if (me.ok) {
+          const meJson = await me.json()
+          setUser(meJson?.data || null)
+        } else setUser(null)
+      }
       return true
     } catch (_) {
       return false
@@ -100,12 +102,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (!token) return { ok: false, error: 'Não autenticado' }
       const res = await fetch('/api/users/me', {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        headers: { 'Content-Type': 'application/json', 'x-access-token': token },
         body: JSON.stringify(payload)
       })
-      const data = await res.json()
-      if (!res.ok) return { ok: false, error: data?.message || 'Falha ao atualizar perfil' }
-      setUser(data)
+      const json = await res.json()
+      if (!res.ok) return { ok: false, error: json?.message || 'Falha ao atualizar perfil' }
+      setUser(json?.data || null)
       return { ok: true }
     } catch (e) {
       return { ok: false, error: 'Erro de rede' }
@@ -117,11 +119,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (!token) return { ok: false, error: 'Não autenticado' }
       const res = await fetch('/api/users/me/change-password', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        headers: { 'Content-Type': 'application/json', 'x-access-token': token },
         body: JSON.stringify(payload)
       })
-      const data = await res.json()
-      if (!res.ok) return { ok: false, error: data?.message || 'Falha ao alterar senha' }
+      const json = await res.json()
+      if (!res.ok) return { ok: false, error: json?.message || 'Falha ao alterar senha' }
       return { ok: true }
     } catch (e) {
       return { ok: false, error: 'Erro de rede' }

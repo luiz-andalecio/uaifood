@@ -12,9 +12,9 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     async function load() {
-      const res = await fetch('/api/admin/dashboard', { headers: { Authorization: `Bearer ${token}` } })
+      const res = await fetch('/api/admin/dashboard', { headers: token ? { 'x-access-token': token } : {} })
       const json = await res.json()
-      setData(json)
+      setData(json?.data || null)
       setLoading(false)
     }
     if (token) load()

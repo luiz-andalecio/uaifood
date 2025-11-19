@@ -47,8 +47,8 @@ router.post('/login', validateBody(loginSchema), authLoginController)
 ```
 
 ## Autenticação / Autorização
-Middlewares em `src/middlewares/auth.ts`:
-- `verifyToken` – valida Bearer token.
+Middlewares em `src/core/auth.ts`:
+- `verifyUser` – lê `x-access-token` e valida o JWT.
 - `isAdmin` / `isRoot` – verificação de roles.
 
 ## Padrão de Nomeação

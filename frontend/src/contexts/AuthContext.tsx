@@ -9,7 +9,7 @@ type AuthContextType = {
   user: User | null
   token: string | null
   loading: boolean
-  login: (email: string, password: string) => Promise<boolean>
+  login: (email: string, password: string) => Promise<{ ok: boolean; message?: string }>
   logout: () => void
   refreshMe: () => Promise<void>
   updateProfile: (payload: { name?: string; email?: string; phone?: string; address?: string; zip_code?: string; password: string }) => Promise<{ ok: boolean; error?: string }>
@@ -58,7 +58,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   // efetua login chamando a API e armazenando token
-  async function login(email: string, password: string): Promise<boolean> {
+  async function login(email: string, password: string): Promise<{ ok: boolean; message?: string }> {
     try {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
@@ -66,13 +66,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         body: JSON.stringify({ email, password })
       })
       const json = await res.json()
-      if (!res.ok) return false
+      if (!res.ok) return { ok: false, message: json?.message }
       const receivedToken: string | undefined = json?.data?.token
       const receivedUser: User | undefined = json?.data?.user
-      if (!receivedToken) return false
+      if (!receivedToken) return { ok: false, message: 'Token não recebido do servidor.' }
 
-      localStorage.setItem('token', receivedToken)
-      setToken(receivedToken)
+  localStorage.setItem('token', receivedToken)
+  setToken(receivedToken)
+  // (re)gera numero da mesa a cada login para tablets virtuais
+  const newMesa = String(Math.floor(Math.random() * 12) + 1)
+  sessionStorage.setItem('uaifood_table_number', newMesa)
 
       // tenta obter dados do usuario logado
       if (receivedUser) {
@@ -84,9 +87,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setUser(meJson?.data || null)
         } else setUser(null)
       }
-      return true
+      return { ok: true }
     } catch (_) {
-      return false
+      return { ok: false, message: 'Falha de rede' }
     }
   }
 
@@ -95,6 +98,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.removeItem('token')
     setToken(null)
     setUser(null)
+    // limpa mesa automatica ao sair para forçar nova atribuicao no proximo login
+    sessionStorage.removeItem('uaifood_table_number')
   }
 
   async function updateProfile(payload: { name?: string; email?: string; phone?: string; address?: string; zip_code?: string; password: string }): Promise<{ ok: boolean; error?: string }> {

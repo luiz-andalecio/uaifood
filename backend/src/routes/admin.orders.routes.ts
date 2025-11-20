@@ -23,7 +23,8 @@ router.get('/', verifyUser, isAdmin, async (req: Request, res: Response) => {
       items: { include: { item: true } }
     }
   })
-  res.json({ orders })
+  // padroniza formato da resposta usando helper (frontend espera data.orders)
+  return sendSuccess(res, { orders })
 })
 
 // PATCH /api/admin/orders/:id/status - atualiza status do pedido

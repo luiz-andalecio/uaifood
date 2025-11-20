@@ -24,7 +24,8 @@ exports.router.get('/', auth_1.verifyUser, auth_1.isAdmin, async (req, res) => {
             items: { include: { item: true } }
         }
     });
-    res.json({ orders });
+    // padroniza formato da resposta usando helper (frontend espera data.orders)
+    return (0, responses_1.sendSuccess)(res, { orders });
 });
 // PATCH /api/admin/orders/:id/status - atualiza status do pedido
 exports.router.patch('/:id/status', auth_1.verifyUser, auth_1.isAdmin, (0, validate_1.validateBody)(admin_schemas_1.setStatusSchema), async (req, res) => {

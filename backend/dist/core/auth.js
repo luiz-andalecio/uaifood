@@ -26,7 +26,6 @@ function verifyUser(req, res, next) {
         return res.status(401).json({ message: 'Operação não permitida' });
     }
 }
-// (remoção de alias verifyToken: usar apenas verifyUser nas rotas)
 function isAdmin(req, res, next) {
     const user = req.user;
     if (!user)

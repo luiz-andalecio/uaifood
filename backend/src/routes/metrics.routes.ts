@@ -1,6 +1,7 @@
 import { Router, type Request, type Response } from 'express'
 import { PrismaClient } from '@prisma/client'
 import { verifyUser, isAdmin } from '../core/auth'
+import { sendSuccess } from '../core/responses'
 
 const prisma = new PrismaClient()
 export const router = Router()
@@ -13,5 +14,6 @@ router.get('/dashboard', verifyUser, isAdmin, async (_req: Request, res: Respons
     prisma.order.count()
   ])
 
-  return res.json({ users, items, orders })
+  // usa helper padronizado para alinhar com consumo no frontend (json.data.*)
+  return sendSuccess(res, { users, items, orders })
 })

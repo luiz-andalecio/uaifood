@@ -39,6 +39,7 @@ export async function updateMe(req: Request, res: Response) {
       name: updated.name,
       email: updated.email,
       phone: updated.phone ?? null,
+      role: updated.role,
       address: updated.address ?? null,
       zip_code: updated.zip_code ?? null,
     })
@@ -82,8 +83,9 @@ export async function adminSetRole(req: Request, res: Response) {
 
 export async function adminResetPassword(req: Request, res: Response) {
   const { id } = req.params
-  const { password } = req.body as { password?: string }
+  const { password, confirmPassword } = req.body as { password?: string; confirmPassword?: string }
   if (!password || password.length < 8) return sendError(res, 'Senha mínima 8 caracteres.', 400)
+  if (!confirmPassword || password !== confirmPassword) return sendError(res, 'As senhas não conferem.', 400)
   const { prisma } = await import('../core/prisma')
   const password_hash = await bcrypt.hash(password, 10)
   await prisma.user.update({ where: { id }, data: { password_hash } })
@@ -97,6 +99,7 @@ export async function adminDeleteUser(req: Request, res: Response) {
   if (id === meId) return sendError(res, 'Não é permitido desativar a si mesmo.', 400)
   const user = await findUserById(id)
   if (!user) return sendError(res, 'Usuário não encontrado.', 404)
+  if (user.role === 'ROOT') return sendError(res, 'Não é permitido excluir o usuário ROOT.', 400)
   await softDeleteUser(id)
   return res.status(204).send()
 }

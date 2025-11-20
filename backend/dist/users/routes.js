@@ -4,14 +4,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.router = void 0;
-// rotas de usue1rios (apenas exemplos iniciais)
+// rotas de usuários
 const express_1 = require("express");
 const client_1 = require("@prisma/client");
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const auth_1 = require("../core/auth");
 const prisma = new client_1.PrismaClient();
 exports.router = (0, express_1.Router)();
-// GET /api/users/me - retorna dados do usue1rio autenticado
+// GET /api/users/me - retorna dados do usuário autenticado
 exports.router.get('/me', auth_1.verifyUser, async (req, res) => {
     const id = req.user?.id;
     if (!id)
@@ -21,7 +21,7 @@ exports.router.get('/me', auth_1.verifyUser, async (req, res) => {
         return res.status(404).json({ message: 'Usuário não encontrado.' });
     return res.json({ id: user.id, name: user.name, email: user.email, role: user.role });
 });
-// GET /api/users - admin lista usue1rios com paginae7e3o simples
+// GET /api/users - admin lista usuários com paginação simples
 exports.router.get('/', auth_1.verifyUser, auth_1.isAdmin, async (req, res) => {
     const page = Number(req.query.page || 1);
     const pageSize = Math.min(Number(req.query.pageSize || 10), 50);
@@ -38,14 +38,14 @@ exports.router.patch('/:id/role', auth_1.verifyUser, auth_1.isRoot, async (req, 
     const { id } = req.params;
     const { role } = req.body;
     if (!['CLIENTE', 'ADMIN', 'ROOT'].includes(role))
-        return res.status(400).json({ message: 'Role inve1lida.' });
-    // regra de segurane7a simples: ne3o permitir remover fanico ROOT
+        return res.status(400).json({ message: 'Role inválida.' });
+    // regra de segurança simples: não permitir remover único ROOT
     if (role !== 'ROOT') {
         const roots = await prisma.user.count({ where: { role: 'ROOT' } });
         if (roots <= 1) {
             const target = await prisma.user.findUnique({ where: { id } });
             if (target?.role === 'ROOT')
-                return res.status(400).json({ message: 'Ne3o e9 permitido remover o fanico ROOT.' });
+                return res.status(400).json({ message: 'Não é permitido remover o único ROOT.' });
         }
     }
     const updated = await prisma.user.update({ where: { id }, data: { role } });

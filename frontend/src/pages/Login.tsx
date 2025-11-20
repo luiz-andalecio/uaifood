@@ -19,13 +19,16 @@ export default function Login() {
       return
     }
     setSubmitting(true)
-    const ok = await login(email, password)
+    const result = await login(email, password)
     setSubmitting(false)
-    if (ok) {
+    if (result.ok) {
       const from = (location.state as any)?.from?.pathname || '/'
       navigate(from, { replace: true })
     } else {
-      toast.error('Falha no login')
+      // se backend retornou mensagem específica como 'Senha incorreta.' exibimos
+      const msg = result.message
+      if (msg && /senha incorreta/i.test(msg)) toast.error('Senha incorreta')
+      else toast.error(msg || 'Falha no login')
     }
   }
 

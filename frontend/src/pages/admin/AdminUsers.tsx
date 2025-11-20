@@ -14,7 +14,7 @@ export default function AdminUsers() {
   const isRoot = user?.role === 'ROOT'
   const toast = useToast()
   const [confirmId, setConfirmId] = useState<string | null>(null)
-  const [passModal, setPassModal] = useState<{ id: string | null; value: string }>({ id: null, value: '' })
+  const [passModal, setPassModal] = useState<{ id: string | null; value: string; confirm: string }>({ id: null, value: '', confirm: '' })
 
   useEffect(() => {
     async function load() {
@@ -46,16 +46,23 @@ export default function AdminUsers() {
     }
   }
 
-  async function submitPassword(id: string, password: string) {
+  async function submitPassword(id: string, password: string, confirmPassword: string) {
     if (!isRoot) return toast.error('Somente ROOT pode redefinir senhas')
-    if (!password) return toast.error('Informe uma senha')
+    if (!password || !confirmPassword) return toast.error('Preencha ambos os campos de senha')
+    if (password !== confirmPassword) return toast.error('As senhas não conferem')
     try {
       const res = await fetch(`/api/users/${id}/password`, {
         method: 'PATCH',
         headers: token ? { 'Content-Type': 'application/json', 'x-access-token': token } : { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password })
+        body: JSON.stringify({ password, confirmPassword })
       })
-      const json = await res.json()
+      let json = null
+      try {
+        json = await res.json()
+      } catch {
+        // erro de parse, provavelmente resposta não-JSON
+        return toast.error('Erro inesperado do servidor. Tente novamente.')
+      }
       if (!res.ok) throw new Error(json?.message || 'Falha ao redefinir senha')
       toast.success('Senha atualizada com sucesso')
     } catch (e: any) {
@@ -65,12 +72,20 @@ export default function AdminUsers() {
 
   async function deleteUser(id: string) {
     if (!isRoot) return toast.error('Somente ROOT pode excluir contas')
+    const userToDelete = users.find(u => u.id === id)
+    if (userToDelete?.role === 'ROOT') return toast.error('Não é permitido excluir o usuário ROOT')
     try {
       const res = await fetch(`/api/users/${id}`, {
         method: 'DELETE',
         headers: token ? { 'x-access-token': token } : {}
       })
-      const json = await res.json()
+      let json = null
+      try {
+        json = await res.json()
+      } catch {
+        // erro de parse, provavelmente resposta não-JSON
+        return toast.error('Erro inesperado do servidor. Tente novamente.')
+      }
       if (!res.ok) throw new Error(json?.message || 'Falha ao excluir')
       setUsers((prev) => prev.filter((u) => u.id !== id))
       toast.success('Usuário excluído (desativado)')
@@ -114,8 +129,10 @@ export default function AdminUsers() {
                   </td>
                   {isRoot && (
                     <td className="p-2 space-x-2">
-                      <button onClick={()=>setPassModal({ id: u.id, value: '' })} className="px-2 py-1 text-xs rounded border border-blue-500 text-blue-600 hover:bg-blue-50 inline-flex items-center gap-1"><KeyRound size={14} /> Resetar senha</button>
-                      <button onClick={()=>setConfirmId(u.id)} className="px-2 py-1 text-xs rounded border border-red-500 text-red-600 hover:bg-red-50 inline-flex items-center gap-1"><Trash2 size={14} /> Excluir</button>
+                      <button onClick={()=>setPassModal({ id: u.id, value: '', confirm: '' })} className="px-2 py-1 text-xs rounded border border-blue-500 text-blue-600 hover:bg-blue-50 inline-flex items-center gap-1"><KeyRound size={14} /> Resetar senha</button>
+                      {u.role !== 'ROOT' && (
+                        <button onClick={()=>setConfirmId(u.id)} className="px-2 py-1 text-xs rounded border border-red-500 text-red-600 hover:bg-red-50 inline-flex items-center gap-1"><Trash2 size={14} /> Excluir</button>
+                      )}
                     </td>
                   )}
                 </tr>
@@ -132,12 +149,13 @@ export default function AdminUsers() {
           </div>
         </Modal>
         {/* Modal para redefinir senha */}
-        <Modal open={!!passModal.id} title="Redefinir senha" onClose={()=>setPassModal({ id: null, value: '' })}>
+        <Modal open={!!passModal.id} title="Redefinir senha" onClose={()=>setPassModal({ id: null, value: '', confirm: '' })}>
           <div className="space-y-3">
-            <input type="password" className="w-full border rounded px-3 py-2" placeholder="Nova senha (mín. 6 caracteres)" value={passModal.value} onChange={(e)=>setPassModal((p)=>({...p, value: e.target.value}))} />
+            <input type="password" className="w-full border rounded px-3 py-2" placeholder="Nova senha (mín. 8 caracteres)" value={passModal.value} onChange={(e)=>setPassModal((p)=>({...p, value: e.target.value}))} />
+            <input type="password" className="w-full border rounded px-3 py-2" placeholder="Confirme a nova senha" value={passModal.confirm || ''} onChange={(e)=>setPassModal((p)=>({...p, confirm: e.target.value}))} />
             <div className="flex justify-end gap-2">
-              <button onClick={()=>setPassModal({ id: null, value: '' })} className="px-3 py-1 border rounded">Cancelar</button>
-              <button onClick={()=>{ if(passModal.id){ submitPassword(passModal.id, passModal.value); setPassModal({ id: null, value: '' }) } }} className="px-3 py-1 rounded bg-blue-600 text-white">Salvar</button>
+              <button onClick={()=>setPassModal({ id: null, value: '', confirm: '' })} className="px-3 py-1 border rounded">Cancelar</button>
+              <button onClick={()=>{ if(passModal.id){ submitPassword(passModal.id, passModal.value, passModal.confirm || ''); setPassModal({ id: null, value: '', confirm: '' }) } }} className="px-3 py-1 rounded bg-blue-600 text-white">Salvar</button>
             </div>
           </div>
         </Modal>

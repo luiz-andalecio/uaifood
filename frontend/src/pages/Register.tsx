@@ -34,11 +34,12 @@ export default function Register() {
     if (res.ok) {
       // auto login
       const ok = await login(email, password)
-      if (ok) {
+      if (ok.ok) {
         toast.success('Bem-vindo! Cadastro concluído.')
         const from = (location.state as any)?.from?.pathname || '/'
         navigate(from, { replace: true })
       } else {
+        // pratica evitada
         toast.info('Conta criada. Faça login para continuar.')
         navigate('/login')
       }

@@ -1,4 +1,4 @@
-// rotas de usue1rios (apenas exemplos iniciais)
+// rotas de usuários
 import { Router, type Request, type Response } from 'express'
 import { PrismaClient } from '@prisma/client'
 import bcrypt from 'bcryptjs'
@@ -7,7 +7,7 @@ import { verifyUser, isAdmin, isRoot } from '../core/auth'
 const prisma = new PrismaClient()
 export const router = Router()
 
-// GET /api/users/me - retorna dados do usue1rio autenticado
+// GET /api/users/me - retorna dados do usuário autenticado
 router.get('/me', verifyUser, async (req: Request, res: Response) => {
   const id = req.user?.id
   if (!id) return res.status(401).json({ message: 'Não autenticado.' })
@@ -16,7 +16,7 @@ router.get('/me', verifyUser, async (req: Request, res: Response) => {
   return res.json({ id: user.id, name: user.name, email: user.email, role: user.role })
 })
 
-// GET /api/users - admin lista usue1rios com paginae7e3o simples
+// GET /api/users - admin lista usuários com paginação simples
 router.get('/', verifyUser, isAdmin, async (req: Request, res: Response) => {
   const page = Number(req.query.page || 1)
   const pageSize = Math.min(Number(req.query.pageSize || 10), 50)
@@ -35,14 +35,13 @@ router.get('/', verifyUser, isAdmin, async (req: Request, res: Response) => {
 router.patch('/:id/role', verifyUser, isRoot, async (req: Request, res: Response) => {
   const { id } = req.params
   const { role } = req.body
-  if (!['CLIENTE', 'ADMIN', 'ROOT'].includes(role)) return res.status(400).json({ message: 'Role inve1lida.' })
-
-  // regra de segurane7a simples: ne3o permitir remover fanico ROOT
+  if (!['CLIENTE', 'ADMIN', 'ROOT'].includes(role)) return res.status(400).json({ message: 'Role inválida.' })
+  // regra de segurança simples: não permitir remover único ROOT
   if (role !== 'ROOT') {
     const roots = await prisma.user.count({ where: { role: 'ROOT' } })
     if (roots <= 1) {
       const target = await prisma.user.findUnique({ where: { id } })
-      if (target?.role === 'ROOT') return res.status(400).json({ message: 'Ne3o e9 permitido remover o fanico ROOT.' })
+      if (target?.role === 'ROOT') return res.status(400).json({ message: 'Não é permitido remover o único ROOT.' })
     }
   }
 

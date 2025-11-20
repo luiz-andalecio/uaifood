@@ -3,7 +3,7 @@ import { z } from 'zod'
 
 export const profileUpdateSchema = z
   .object({
-    name: z.string().min(1, 'Nome é obrigatório.').optional(),
+    name: z.string().min(1, 'Nome é obrigatório.').max(50, 'Nome deve ter no máximo 50 caracteres.').optional(),
     email: z.string().email('Email inválido.').transform((v: string) => v.trim().toLowerCase()).optional(),
     phone: z.string().optional(),
     address: z.string().optional(),
@@ -31,7 +31,11 @@ export const roleUpdateSchema = z.object({
 })
 
 export const adminResetPasswordSchema = z.object({
-  password: z.string().min(6, 'Senha deve ter pelo menos 6 caracteres.'),
+  password: z.string().min(8, 'Senha deve ter pelo menos 8 caracteres.'),
+  confirmPassword: z.string().min(8, 'Confirmação de senha é obrigatória.')
+}).refine((d) => d.password === d.confirmPassword, {
+  message: 'As senhas não conferem.',
+  path: ['confirmPassword'],
 })
 
 export type ProfileUpdateInput = z.infer<typeof profileUpdateSchema>

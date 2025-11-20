@@ -67,7 +67,14 @@ paths:
     $ref: './paths/admin.yaml#/adminOrdersDelete'
 components:
   securitySchemes:
-    $ref: './components/security.yaml'
+    xAccessToken:
+      type: apiKey
+      in: header
+      name: x-access-token
+      description: |
+        JWT retornado por `/api/auth/login`.
+        Envie em cada requisição protegida como header: `x-access-token: <token>`.
+        (Esquema inline para evitar problemas de renderização do botão Authorize com $ref.)
   schemas:
     $ref: './components/schemas.yaml'
   responses:

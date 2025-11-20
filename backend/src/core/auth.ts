@@ -24,8 +24,6 @@ export function verifyUser(req: Request, res: Response, next: NextFunction) {
     }
 }
 
-// (remoção de alias verifyToken: usar apenas verifyUser nas rotas)
-
 export function isAdmin(req: Request, res: Response, next: NextFunction) {
     const user = req.user
     if (!user) return res.status(401).json({ message: 'Não autenticado.' })

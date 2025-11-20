@@ -78,6 +78,7 @@ async function updateMe(req, res) {
             name: updated.name,
             email: updated.email,
             phone: updated.phone ?? null,
+            role: updated.role,
             address: updated.address ?? null,
             zip_code: updated.zip_code ?? null,
         });

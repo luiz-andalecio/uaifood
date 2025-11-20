@@ -126,9 +126,11 @@ async function adminSetRole(req, res) {
 }
 async function adminResetPassword(req, res) {
     const { id } = req.params;
-    const { password } = req.body;
+    const { password, confirmPassword } = req.body;
     if (!password || password.length < 8)
         return (0, responses_1.sendError)(res, 'Senha mínima 8 caracteres.', 400);
+    if (!confirmPassword || password !== confirmPassword)
+        return (0, responses_1.sendError)(res, 'As senhas não conferem.', 400);
     const { prisma } = await Promise.resolve().then(() => __importStar(require('../core/prisma')));
     const password_hash = await bcryptjs_1.default.hash(password, 10);
     await prisma.user.update({ where: { id }, data: { password_hash } });
@@ -144,6 +146,8 @@ async function adminDeleteUser(req, res) {
     const user = await (0, model_1.findUserById)(id);
     if (!user)
         return (0, responses_1.sendError)(res, 'Usuário não encontrado.', 404);
+    if (user.role === 'ROOT')
+        return (0, responses_1.sendError)(res, 'Não é permitido excluir o usuário ROOT.', 400);
     await (0, model_1.softDeleteUser)(id);
     return res.status(204).send();
 }

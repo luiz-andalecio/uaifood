@@ -41,6 +41,8 @@ router.patch('/:id/role', verifyUser, isRoot, adminSetRole)
 
 // POST /api/users/:id/password - redefine senha de um usuário (ADMIN/ROOT)
 router.post('/:id/password', verifyUser, isAdmin, adminResetPassword)
+// Compatibilidade: aceitar também PATCH para clientes antigos
+router.patch('/:id/password', verifyUser, isAdmin, adminResetPassword)
 
 // DELETE /api/users/:id - desativa usuário (admin/root)
 router.delete('/:id', verifyUser, isAdmin, adminDeleteUser)
